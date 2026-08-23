@@ -1,0 +1,4 @@
+#include "resource.h"
+
+IDI_APP_ICON ICON "..\\assets\\app_icon.ico"
+IDR_EMBEDDED_ZIP RCDATA "..\\assets.zip"

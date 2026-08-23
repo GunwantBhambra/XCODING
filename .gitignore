@@ -1,0 +1,21 @@
+# Build artifacts
+*.obj
+*.res
+*.pdb
+*.ilk
+*.exp
+*.lib
+!third_party/**
+
+# User session and window state
+.window_state
+.meta
+.meta_session
+
+# Temporary assets zip and caches
+assets.zip
+WebView2Data/
+temp/
+updates/
+scratch/
+.vs/
