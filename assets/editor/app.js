@@ -2515,6 +2515,195 @@ const LEVELS = [
       }
     ],
     "starterCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    // Read n and compute sum of digits\n    \n    return 0;\n}\n"
+  },
+  {
+    "id": 76,
+    "title": "Inverted Star Triangle",
+    "topic": "Patterns",
+    "difficulty": "MEDIUM",
+    "desc": "Read an integer <code>N</code> (1 to 10). Print an inverted right-angled triangle of asterisks, starting with <code>N</code> stars on the first line down to 1 star on the last line.",
+    "hint": "Use an outer loop running from N down to 1, and an inner loop printing asterisks for that row length.",
+    "examples": [
+      {
+        "input": "4",
+        "output": "****\n***\n**\n*"
+      },
+      {
+        "input": "2",
+        "output": "**\n*"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "4",
+        "expected": "****\n***\n**\n*"
+      },
+      {
+        "input": "2",
+        "expected": "**\n*"
+      },
+      {
+        "input": "1",
+        "expected": "*"
+      },
+      {
+        "input": "5",
+        "expected": "*****\n****\n***\n**\n*"
+      }
+    ],
+    "starterCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    // Read n and print inverted triangle\n    \n    return 0;\n}\n"
+  },
+  {
+    "id": 77,
+    "title": "Alternating Binary Sequence",
+    "topic": "Loops",
+    "difficulty": "EASY",
+    "desc": "Read an integer <code>N</code> (1 to 20). Print <code>N</code> numbers on a single space-separated line alternating between <code>0</code> and <code>1</code>, starting with <code>0</code>.",
+    "hint": "Check the loop counter parity (i % 2) to alternate between 0 and 1.",
+    "examples": [
+      {
+        "input": "5",
+        "output": "0 1 0 1 0"
+      },
+      {
+        "input": "6",
+        "output": "0 1 0 1 0 1"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "5",
+        "expected": "0 1 0 1 0"
+      },
+      {
+        "input": "6",
+        "expected": "0 1 0 1 0 1"
+      },
+      {
+        "input": "1",
+        "expected": "0"
+      },
+      {
+        "input": "8",
+        "expected": "0 1 0 1 0 1 0 1"
+      }
+    ],
+    "starterCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    // Read n and print alternating 0 and 1 sequence\n    \n    return 0;\n}\n"
+  },
+  {
+    "id": 78,
+    "title": "Find Minimum in Stream",
+    "topic": "Loops",
+    "difficulty": "MEDIUM",
+    "desc": "Read an integer <code>N</code>, followed by <code>N</code> integers. Output the minimum value among them in the format:<br><code>Minimum: [min_val]</code>",
+    "hint": "Initialize a minimum variable with the first number or a large value, and update it whenever a smaller number is read.",
+    "examples": [
+      {
+        "input": "4\n12 5 88 3",
+        "output": "Minimum: 3"
+      },
+      {
+        "input": "3\n-7 -2 -15",
+        "output": "Minimum: -15"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "4\n12 5 88 3",
+        "expected": "Minimum: 3"
+      },
+      {
+        "input": "3\n-7 -2 -15",
+        "expected": "Minimum: -15"
+      },
+      {
+        "input": "1\n42",
+        "expected": "Minimum: 42"
+      },
+      {
+        "input": "5\n10 20 30 5 99",
+        "expected": "Minimum: 5"
+      }
+    ],
+    "starterCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    // Read n, then loop to find the minimum of n numbers\n    \n    return 0;\n}\n"
+  },
+  {
+    "id": 79,
+    "title": "Count Multiples of K",
+    "topic": "Loops",
+    "difficulty": "MEDIUM",
+    "desc": "Read two integers <code>N</code> and <code>K</code> ($K > 0$). Count how many integers from 1 to <code>N</code> (inclusive) are evenly divisible by <code>K</code>:<br><code>Count: [count]</code>",
+    "hint": "Iterate from 1 to N and increment a counter whenever (i % K == 0).",
+    "examples": [
+      {
+        "input": "15 3",
+        "output": "Count: 5"
+      },
+      {
+        "input": "10 4",
+        "output": "Count: 2"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "15 3",
+        "expected": "Count: 5"
+      },
+      {
+        "input": "10 4",
+        "expected": "Count: 2"
+      },
+      {
+        "input": "7 2",
+        "expected": "Count: 3"
+      },
+      {
+        "input": "20 5",
+        "expected": "Count: 4"
+      },
+      {
+        "input": "3 10",
+        "expected": "Count: 0"
+      }
+    ],
+    "starterCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n, k;\n    // Read n and k, count numbers from 1 to n divisible by k\n    \n    return 0;\n}\n"
+  },
+  {
+    "id": 80,
+    "title": "Hollow Square Border",
+    "topic": "Patterns",
+    "difficulty": "HARD",
+    "desc": "Read an integer <code>N</code> ($N \\ge 2$). Print an $N \\times N$ square where the border consists of asterisks <code>*</code> and the interior is filled with spaces.",
+    "hint": "In a nested row-column loop, print '*' if on any border (row is first/last or column is first/last), otherwise print ' '.",
+    "examples": [
+      {
+        "input": "4",
+        "output": "****\n*  *\n*  *\n****"
+      },
+      {
+        "input": "3",
+        "output": "***\n* *\n***"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "4",
+        "expected": "****\n*  *\n*  *\n****"
+      },
+      {
+        "input": "3",
+        "expected": "***\n* *\n***"
+      },
+      {
+        "input": "2",
+        "expected": "**\n**"
+      },
+      {
+        "input": "5",
+        "expected": "*****\n*   *\n*   *\n*   *\n*****"
+      }
+    ],
+    "starterCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    // Read n and print hollow square border\n    \n    return 0;\n}\n"
   }
 ];
 
