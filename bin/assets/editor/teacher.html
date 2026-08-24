@@ -82,10 +82,10 @@
             </div>
             <div class="teacher-metric-card">
               <div class="tm-label">AVG CLEARED</div>
-              <div class="tm-val cyan" id="tm-avg-cleared">-- / 50</div>
+              <div class="tm-val cyan" id="tm-avg-cleared">--</div>
             </div>
             <div class="teacher-metric-card">
-              <div class="tm-label">50/50 MASTERY</div>
+              <div class="tm-label">MASTERY (ALL)</div>
               <div class="tm-val gold" id="tm-completed-count">--</div>
             </div>
           </div>
@@ -102,7 +102,7 @@
           <!-- Quick Filter Segmented Pills -->
           <div class="teacher-filter-pills" id="roster-filter-pills">
             <button class="t-pill active" data-filter="all">ALL</button>
-            <button class="t-pill" data-filter="mastered">50/50</button>
+            <button class="t-pill" data-filter="mastered">MASTERED</button>
             <button class="t-pill" data-filter="active">ACTIVE TODAY</button>
             <button class="t-pill" data-filter="needhelp">&lt; 10</button>
           </div>
@@ -142,7 +142,7 @@
             <div class="student-progress-summary">
               <div class="student-progress-numbers">
                 <span class="sp-big" id="insp-cleared-count">0</span>
-                <span class="sp-total">/ 50 CLEARED</span>
+                <span class="sp-total" id="insp-total-label">CLEARED</span>
               </div>
               <div class="student-prog-bar-wrap">
                 <div class="student-prog-bar-fill" id="insp-progress-fill" style="width: 0%"></div>
@@ -150,10 +150,10 @@
             </div>
           </div>
 
-          <!-- 50-LEVEL PROGRESSION MATRIX -->
+          <!-- LEVEL PROGRESSION MATRIX -->
           <div class="levels-matrix-container">
             <div class="levels-matrix-header">
-              <span class="matrix-title">50-CHALLENGE CODE INSPECTION MATRIX</span>
+              <span class="matrix-title">CODE INSPECTION MATRIX</span>
               <div class="matrix-legend">
                 <span class="legend-item"><span class="legend-dot green"></span> Cleared (100%)</span>
                 <span class="legend-item"><span class="legend-dot yellow"></span> Attempted Code</span>
@@ -161,9 +161,9 @@
               </div>
             </div>
 
-            <!-- 50 Level Chips Grid -->
+            <!-- Level Chips Grid -->
             <div class="levels-matrix-grid" id="levels-matrix-grid">
-              <!-- Dynamically populated 50 Level inspection buttons -->
+              <!-- Dynamically populated Level inspection buttons -->
             </div>
           </div>
 

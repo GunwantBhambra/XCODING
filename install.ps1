@@ -27,23 +27,11 @@
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
     $urlsToTry = @(
-        "https://github.com/GunwantBhambra/XCODING/releases/latest/download/XCODING_windows_x64.zip",
         "https://github.com/GunwantBhambra/XCODING/raw/main/XCODING_windows_x64.zip",
+        "https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/XCODING_windows_x64.zip",
         "https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/bin/XCODING_windows_x64.zip",
-        "https://github.com/GunwantBhambra/XCODING/releases/download/v1.0.1/XCODING_windows_x64.zip"
+        "https://github.com/GunwantBhambra/XCODING/releases/latest/download/XCODING_windows_x64.zip"
     )
-
-    try {
-        $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/GunwantBhambra/XCODING/releases" -Headers @{"User-Agent"="Mozilla/5.0"}
-        if ($releases -and $releases.Count -gt 0) {
-            foreach ($asset in $releases[0].assets) {
-                if ($asset.name -like "*.zip") {
-                    $urlsToTry = @($asset.browser_download_url) + $urlsToTry
-                    break
-                }
-            }
-        }
-    } catch {}
 
     Write-Host "[2/4] Downloading and extracting XCODING package..." -ForegroundColor Yellow
     $downloadSuccess = $false
@@ -57,61 +45,62 @@
             Write-Host "  -> Fetching from: $url" -ForegroundColor DarkGray
             if (Test-Path $tempZip) { Remove-Item $tempZip -Force -ErrorAction SilentlyContinue }
             
-            $req = [System.Net.HttpWebRequest]::Create($url)
-            $req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-            $req.AllowAutoRedirect = $true
-            $req.Timeout = 60000
-            $resp = $req.GetResponse()
-            
-            $fileStream = [System.IO.File]::Create($tempZip)
-            $respStream = $resp.GetResponseStream()
-            $respStream.CopyTo($fileStream)
-            $fileStream.Close()
-            $respStream.Close()
-            $resp.Close()
+            # Use curl.exe if available (fastest and handles redirects/TLS natively)
+            $curlPath = "$env:SystemRoot\System32\curl.exe"
+            if (Test-Path $curlPath) {
+                & $curlPath -f -L -s -S --retry 2 -o $tempZip $url 2>$null
+            }
+
+            if ((-not (Test-Path $tempZip)) -or ((Get-Item $tempZip).Length -lt 1000000)) {
+                $req = [System.Net.HttpWebRequest]::Create($url)
+                $req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+                $req.AllowAutoRedirect = $true
+                $req.Timeout = 60000
+                $resp = $req.GetResponse()
+                
+                $fileStream = [System.IO.File]::Create($tempZip)
+                $respStream = $resp.GetResponseStream()
+                $respStream.CopyTo($fileStream)
+                $fileStream.Close()
+                $respStream.Close()
+                $resp.Close()
+            }
 
             if ((Test-Path $tempZip) -and ((Get-Item $tempZip).Length -gt 1000000)) {
-                $extractStaging = "$stagingDir\extracted"
-                New-Item -ItemType Directory -Path $extractStaging -Force | Out-Null
-                Expand-Archive -Path $tempZip -DestinationPath $extractStaging -Force
+                # 1. Back up metadata if it exists
+                $metaBackup = $null
+                if (Test-Path "$installDir\.meta") { $metaBackup = Get-Content "$installDir\.meta" -Raw }
+                $winStateBackup = $null
+                if (Test-Path "$installDir\.window_state") { $winStateBackup = Get-Content "$installDir\.window_state" -Raw }
 
-                # Atomic copy into $installDir
-                Get-ChildItem -Path $extractStaging -Recurse | ForEach-Object {
-                    $relPath = $_.FullName.Substring($extractStaging.Length).TrimStart('\', '/')
-                    $targetPath = Join-Path $installDir $relPath
-                    
-                    if ($_.PSIsContainer) {
-                        if (-not (Test-Path $targetPath)) { New-Item -ItemType Directory -Path $targetPath -Force | Out-Null }
-                    } else {
-                        $targetParent = Split-Path $targetPath -Parent
-                        if (-not (Test-Path $targetParent)) { New-Item -ItemType Directory -Path $targetParent -Force | Out-Null }
-                        
-                        $copied = $false
-                        for ($attempt = 1; $attempt -le 3; $attempt++) {
-                            try {
-                                Copy-Item -Path $_.FullName -Destination $targetPath -Force -ErrorAction Stop
-                                $copied = $true
-                                break
-                            } catch {
-                                if (Test-Path $targetPath) {
-                                    $oldPath = "$targetPath.old.$([System.Guid]::NewGuid().ToString('N').Substring(0,4))"
-                                    try {
-                                        Rename-Item -Path $targetPath -NewName (Split-Path $oldPath -Leaf) -Force -ErrorAction SilentlyContinue
-                                        Copy-Item -Path $_.FullName -Destination $targetPath -Force -ErrorAction Stop
-                                        $copied = $true
-                                        break
-                                    } catch {
-                                        Start-Sleep -Milliseconds 400
-                                    }
-                                }
-                            }
-                        }
-                    }
+                # 2. Terminate all lingering processes forcefully and wait
+                Get-Process -Name "XCODING", "XCODING_TEACHER", "CodeFork", "msedgewebview2" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+                Start-Sleep -Milliseconds 800
+
+                # 3. DELETE AND REMAKE INSTALL DIRECTORY
+                if (Test-Path $installDir) {
+                    Remove-Item -Path $installDir -Recurse -Force -ErrorAction SilentlyContinue
+                    Start-Sleep -Milliseconds 200
+                }
+                New-Item -ItemType Directory -Path $installDir -Force | Out-Null
+
+                # 4. Extract package directly into clean $installDir
+                $tarExe = "$env:SystemRoot\System32\tar.exe"
+                if (Test-Path $tarExe) {
+                    & $tarExe -xf $tempZip -C $installDir
+                } else {
+                    Expand-Archive -Path $tempZip -DestinationPath $installDir -Force
                 }
 
-                # Cleanup
-                Get-ChildItem -Path $installDir -Filter "*.old.*" -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
+                # 5. Restore metadata
+                if ($metaBackup) { Set-Content -Path "$installDir\.meta" -Value $metaBackup -Force }
+                if ($winStateBackup) { Set-Content -Path "$installDir\.window_state" -Value $winStateBackup -Force }
+
+                # 6. Comprehensive cleanup
                 Remove-Item -Path $stagingDir -Recurse -Force -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $installDir -Filter "*.zip" -File | Remove-Item -Force -ErrorAction SilentlyContinue
+                Get-ChildItem -Path $installDir -Filter "*.old.*" -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
+                if (Test-Path "$installDir\tracted") { Remove-Item -Path "$installDir\tracted" -Recurse -Force -ErrorAction SilentlyContinue }
                 
                 $downloadSuccess = $true
                 Write-Host "[SUCCESS] Package installed successfully to $installDir" -ForegroundColor Green

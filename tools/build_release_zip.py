@@ -29,7 +29,15 @@ def build_release_zip():
 
     assets_dir = os.path.join(BIN_DIR, "assets")
 
-    with zipfile.ZipFile(OUT_ZIP_BIN, "w", zipfile.ZIP_DEFLATED) as zf:
+    # Remove any existing zip in root or bin
+    for p in [OUT_ZIP_ROOT, OUT_ZIP_BIN]:
+        if os.path.exists(p):
+            try:
+                os.remove(p)
+            except Exception:
+                pass
+
+    with zipfile.ZipFile(OUT_ZIP_ROOT, "w", zipfile.ZIP_DEFLATED) as zf:
         # Add root binaries and files
         for arcname, filepath in files_to_include:
             if os.path.exists(filepath):
@@ -47,12 +55,8 @@ def build_release_zip():
                     zf.write(filepath, relpath)
             print(f"  + Added assets/ tree")
 
-    # Copy to root as well for convenience
-    shutil.copy2(OUT_ZIP_BIN, OUT_ZIP_ROOT)
-
-    size_mb = os.path.getsize(OUT_ZIP_BIN) / (1024 * 1024)
+    size_mb = os.path.getsize(OUT_ZIP_ROOT) / (1024 * 1024)
     print(f"\n[SUCCESS] Created release bundle:")
-    print(f"  -> {OUT_ZIP_BIN} ({size_mb:.2f} MB)")
     print(f"  -> {OUT_ZIP_ROOT} ({size_mb:.2f} MB)")
 
 if __name__ == "__main__":
