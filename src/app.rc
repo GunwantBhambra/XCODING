@@ -2,7 +2,6 @@
 #include <winver.h>
 
 IDI_APP_ICON ICON "..\\assets\\app_icon.ico"
-IDR_EMBEDDED_ZIP RCDATA "..\\assets.zip"
 
 // Embed Application Manifest
 1 24 "app.manifest"

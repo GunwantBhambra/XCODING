@@ -44,60 +44,17 @@ static std::wstring EnsureAssetsExtracted(HINSTANCE hInstance) {
     GetModuleFileNameW(NULL, exePathBuffer, MAX_PATH);
     fs::path exeDir = fs::path(exePathBuffer).parent_path();
 
-    // Dev check: If local assets/editor/index.html exists adjacent to the exe, use it directly!
-    fs::path devHtml = exeDir / "assets" / "editor" / "index.html";
-    if (fs::exists(devHtml)) {
-        return devHtml.wstring();
+    // 1. Check if assets/editor/index.html exists adjacent to the exe
+    fs::path localHtml = exeDir / "assets" / "editor" / "index.html";
+    if (fs::exists(localHtml)) {
+        return localHtml.wstring();
     }
 
+    // 2. Fallback check in %LOCALAPPDATA%\XCODING\assets
     fs::path appDataDir = fs::path(GetXcodingAppDataDir());
-    fs::path localHtml = appDataDir / "assets" / "editor" / "index.html";
-    fs::path versionFile = appDataDir / ".assets_version";
-
-    bool needExtract = true;
-    if (fs::exists(localHtml) && fs::exists(versionFile)) {
-        std::ifstream ifs(versionFile);
-        std::string curVer;
-        if (ifs >> curVer && curVer == ASSETS_BUILD_HASH) {
-            needExtract = false;
-        }
-    }
-
-    if (needExtract) {
-        HRSRC hRes = FindResourceW(hInstance, MAKEINTRESOURCEW(IDR_EMBEDDED_ZIP), (LPCWSTR)RT_RCDATA);
-        if (hRes) {
-            HGLOBAL hData = LoadResource(hInstance, hRes);
-            DWORD size = SizeofResource(hInstance, hRes);
-            const void* pData = LockResource(hData);
-            if (pData && size > 0) {
-                fs::path tempZip = appDataDir / "assets_bundle.zip";
-                std::ofstream ofs(tempZip, std::ios::binary);
-                ofs.write(reinterpret_cast<const char*>(pData), size);
-                ofs.close();
-
-                // Extract with tar.exe
-                std::wstring cmd = L"tar.exe -xf \"" + tempZip.wstring() + L"\" -C \"" + appDataDir.wstring() + L"\"";
-                STARTUPINFOW si = { sizeof(si) };
-                si.dwFlags = STARTF_USESHOWWINDOW;
-                si.wShowWindow = SW_HIDE;
-                PROCESS_INFORMATION pi = { 0 };
-
-                std::vector<wchar_t> cmdBuf(cmd.begin(), cmd.end());
-                cmdBuf.push_back(0);
-
-                if (CreateProcessW(NULL, cmdBuf.data(), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
-                    WaitForSingleObject(pi.hProcess, 15000);
-                    CloseHandle(pi.hProcess);
-                    CloseHandle(pi.hThread);
-                }
-
-                std::error_code ec;
-                fs::remove(tempZip, ec);
-
-                std::ofstream vofs(versionFile);
-                vofs << ASSETS_BUILD_HASH;
-            }
-        }
+    fs::path appDataHtml = appDataDir / "assets" / "editor" / "index.html";
+    if (fs::exists(appDataHtml)) {
+        return appDataHtml.wstring();
     }
 
     return localHtml.wstring();
