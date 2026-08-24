@@ -159,24 +159,14 @@
 
                 <!-- Menu Actions -->
                 <div class="dropdown-actions-group">
-                  <button id="btn-check-updates" class="dropdown-action-item" title="Check for application updates">
-                    <div class="action-item-left">
-                      <svg class="action-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-                      </svg>
-                      <span>Check for Updates</span>
-                    </div>
-                    <span class="app-version-badge" id="dropdown-version-tag">v1.0.1</span>
-                  </button>
-
-                  <button id="btn-force-update" class="dropdown-action-item force-update-action" title="1-Click Force Reinstall from Cloud (Downloads & updates all binaries/assets)">
+                  <button id="btn-update-app" class="dropdown-action-item force-update-action" title="1-Click Cloud Update (Downloads and updates all binaries/assets directly)">
                     <div class="action-item-left">
                       <svg class="action-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #ffb86c;">
                         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
                       </svg>
-                      <span style="font-weight: 600; color: #ffb86c;">⚡ Force Update / Reinstall</span>
+                      <span style="font-weight: 700; color: #ffb86c;">UPDATE APP</span>
                     </div>
-                    <span class="app-version-badge warning">1-CLICK</span>
+                    <span class="app-version-badge warning" id="dropdown-version-tag">v1.0.1</span>
                   </button>
 
                   <button id="btn-logout" class="dropdown-logout-action" title="Sign out of student account">

@@ -2914,34 +2914,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnLogout = document.getElementById('btn-logout');
   if (btnLogout) btnLogout.addEventListener('click', handleSignOut);
 
-  // Auto-Update Controls
-  const btnCheckUpdates = document.getElementById('btn-check-updates');
-  if (btnCheckUpdates) {
-    btnCheckUpdates.addEventListener('click', (e) => {
+  // Cloud Update Action
+  const btnUpdateApp = document.getElementById('btn-update-app') || document.getElementById('btn-force-update');
+  if (btnUpdateApp) {
+    btnUpdateApp.addEventListener('click', (e) => {
       e.stopPropagation();
       if (userDropdownMenu) userDropdownMenu.classList.add('hidden');
-      appendTerminalRow("[Update] Checking for updates...\n", "info-msg");
-      sendNativeMessage({ action: 'check_updates', manual: 'true' });
+      appendTerminalRow("\n==================================================", "info-msg");
+      appendTerminalRow(" [UPDATE] Launching Native Cloud Updater...", "success-msg");
+      appendTerminalRow("==================================================\n", "info-msg");
+      sendNativeMessage({ action: 'force_update' });
     });
   }
 
   const btnPerformUpdate = document.getElementById('btn-perform-update');
   if (btnPerformUpdate) {
     btnPerformUpdate.addEventListener('click', () => {
-      if (state.updateDownloadUrl) {
-        sendNativeMessage({ action: 'perform_update', downloadUrl: state.updateDownloadUrl });
-      }
-    });
-  }
-
-  const btnForceUpdate = document.getElementById('btn-force-update');
-  if (btnForceUpdate) {
-    btnForceUpdate.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (userDropdownMenu) userDropdownMenu.classList.add('hidden');
-      appendTerminalRow("\n==================================================", "info-msg");
-      appendTerminalRow(" [1-CLICK FORCE UPDATE] Launching Cloud Installer...", "success-msg");
-      appendTerminalRow("==================================================\n", "info-msg");
       sendNativeMessage({ action: 'force_update' });
     });
   }
