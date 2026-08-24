@@ -483,12 +483,41 @@ void IdeHost::HandlePerformUpdate(const std::string& downloadUrl) {
         fs::create_directories(updatesDir, ec);
         fs::path newExePath = updatesDir / "XCODING_update.exe";
 
-        std::wstring wUrl = Utf8ToWide(downloadUrl);
-        std::wstring wDest = newExePath.wstring();
+        // Download via standard WinINet HTTPS stream
+        HINTERNET hInternet = InternetOpenW(L"Mozilla/5.0 (Windows NT 10.0; Win64; x64) XCODING/1.0", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+        if (!hInternet) {
+            PostJsonToWeb("{\"type\":\"update_progress\",\"status\":\"error\",\"message\":\"Unable to initialize download network.\"}");
+            return;
+        }
 
-        HRESULT hr = URLDownloadToFileW(NULL, wUrl.c_str(), wDest.c_str(), 0, NULL);
-        if (FAILED(hr) || !fs::exists(newExePath) || fs::file_size(newExePath) < 50000) {
-            PostJsonToWeb("{\"type\":\"update_progress\",\"status\":\"error\",\"message\":\"Download failed. Please check internet connection.\"}");
+        HINTERNET hUrl = InternetOpenUrlA(hInternet, downloadUrl.c_str(), NULL, 0,
+                                          INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_SECURE, 0);
+        if (!hUrl) {
+            InternetCloseHandle(hInternet);
+            PostJsonToWeb("{\"type\":\"update_progress\",\"status\":\"error\",\"message\":\"Could not connect to release download server.\"}");
+            return;
+        }
+
+        std::ofstream outFile(newExePath, std::ios::binary | std::ios::out);
+        if (!outFile.is_open()) {
+            InternetCloseHandle(hUrl);
+            InternetCloseHandle(hInternet);
+            PostJsonToWeb("{\"type\":\"update_progress\",\"status\":\"error\",\"message\":\"Could not write update file to disk.\"}");
+            return;
+        }
+
+        char buffer[32768];
+        DWORD bytesRead = 0;
+        while (InternetReadFile(hUrl, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
+            outFile.write(buffer, bytesRead);
+        }
+        outFile.close();
+
+        InternetCloseHandle(hUrl);
+        InternetCloseHandle(hInternet);
+
+        if (!fs::exists(newExePath) || fs::file_size(newExePath) < 50000) {
+            PostJsonToWeb("{\"type\":\"update_progress\",\"status\":\"error\",\"message\":\"Downloaded package corrupted or incomplete.\"}");
             return;
         }
 
