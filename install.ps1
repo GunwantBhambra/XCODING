@@ -16,6 +16,10 @@
     $tempZip = "$env:TEMP\XCODING_windows_x64.zip"
     $exePath = "$installDir\XCODING.exe"
 
+    # Terminate any running IDE instances so binaries can be overwritten
+    Get-Process -Name "XCODING", "XCODING_TEACHER", "CodeFork" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Start-Sleep -Milliseconds 600
+
     if (-not (Test-Path $installDir)) {
         New-Item -ItemType Directory -Path $installDir -Force | Out-Null
     }
@@ -64,7 +68,13 @@
             $resp.Close()
 
             if ((Test-Path $tempZip) -and ((Get-Item $tempZip).Length -gt 1000000)) {
-                Expand-Archive -Path $tempZip -DestinationPath $installDir -Force
+                try {
+                    Expand-Archive -Path $tempZip -DestinationPath $installDir -Force
+                } catch {
+                    Get-Process -Name "XCODING", "XCODING_TEACHER", "CodeFork" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+                    Start-Sleep -Seconds 1
+                    Expand-Archive -Path $tempZip -DestinationPath $installDir -Force
+                }
                 Remove-Item $tempZip -Force -ErrorAction SilentlyContinue
                 $downloadSuccess = $true
                 Write-Host "[SUCCESS] Package installed successfully to $installDir" -ForegroundColor Green

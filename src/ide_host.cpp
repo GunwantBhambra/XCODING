@@ -584,7 +584,10 @@ void IdeHost::HandleForceUpdate() {
             ofs << "echo =========================================================\n";
             ofs << "echo  Starting XCODING 1-Click Cloud Reinstall / Update\n";
             ofs << "echo =========================================================\n";
-            ofs << "timeout /t 1 /nobreak >nul\n";
+            ofs << "taskkill /F /IM XCODING.exe /T >nul 2>&1\n";
+            ofs << "taskkill /F /IM XCODING_TEACHER.exe /T >nul 2>&1\n";
+            ofs << "taskkill /F /IM CodeFork.exe /T >nul 2>&1\n";
+            ofs << "timeout /t 2 /nobreak >nul\n";
             ofs << "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/install.ps1 | iex\"\n";
             ofs << "if errorlevel 1 (\n";
             ofs << "    echo.\n";
@@ -605,8 +608,8 @@ void IdeHost::HandleForceUpdate() {
         );
 
         if ((INT_PTR)hInst > 32) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(800));
-            PostMessageW(m_hWnd, WM_CLOSE, 0, 0);
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            ExitProcess(0);
         } else {
             // Fallback: try direct powershell ShellExecute
             HINSTANCE hPs = ShellExecuteW(
@@ -619,8 +622,8 @@ void IdeHost::HandleForceUpdate() {
             );
 
             if ((INT_PTR)hPs > 32) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(800));
-                PostMessageW(m_hWnd, WM_CLOSE, 0, 0);
+                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                ExitProcess(0);
             } else {
                 PostJsonToWeb("{\"type\":\"force_update_error\",\"message\":\"Failed to launch updater process.\"}");
             }
