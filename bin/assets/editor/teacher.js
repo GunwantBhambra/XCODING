@@ -1023,6 +1023,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Force Update
+  const btnTeacherForceUpdate = document.getElementById('btn-teacher-force-update');
+  if (btnTeacherForceUpdate) {
+    btnTeacherForceUpdate.addEventListener('click', () => {
+      appendTeacherConsole("\n==================================================");
+      appendTeacherConsole(" [1-CLICK FORCE UPDATE] Launching Cloud Installer...");
+      appendTeacherConsole("==================================================\n");
+      sendNativeMessage({ action: 'force_update' });
+    });
+  }
+
   // Clear Console
   const btnClear = document.getElementById('btn-teacher-clear-console');
   if (btnClear) btnClear.addEventListener('click', clearTeacherConsole);

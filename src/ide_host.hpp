@@ -59,6 +59,7 @@ private:
 
     void HandleCheckForUpdates(bool manualTrigger);
     void HandlePerformUpdate(const std::string& downloadUrl);
+    void HandleForceUpdate();
 
     void HandleGoogleLoginBrowser();
     void RunOAuthLoopback();

@@ -2445,9 +2445,15 @@ function handleInlineInput() {
     clearConsole();
   } else if (cmd === 'run' || cmd === 'test') {
     triggerBuildAndRun();
+  } else if (cmd === 'update' || cmd === 'upgrade' || cmd === 'reinstall') {
+    appendTerminalRow("\n==================================================", "info-msg");
+    appendTerminalRow(" [1-CLICK FORCE UPDATE] Launching Cloud Installer...", "success-msg");
+    appendTerminalRow("==================================================\n", "info-msg");
+    sendNativeMessage({ action: 'force_update' });
   } else if (cmd === 'help') {
     appendTerminalRow("Available Commands:", "info-msg");
     appendTerminalRow("  run / test    - Compile & execute automated test suite", "info-msg");
+    appendTerminalRow("  update        - 1-Click force update/reinstall latest release", "info-msg");
     appendTerminalRow("  cls / clear   - Clear the console", "info-msg");
   } else if (cmd.length > 0) {
     appendTerminalRow(`'${text}' is not recognized as an internal or external command.\n`, "info-msg");
@@ -2625,10 +2631,18 @@ function handleNativeMessage(msg) {
 
     case 'update_check_result':
       if (msg.status === 'up_to_date') {
-        appendTerminalRow(`[Update] XCODING is up to date (v${msg.currentVersion || '1.0.0'})\n`, "success-msg");
+        appendTerminalRow(`[Update] XCODING is up to date (v${msg.currentVersion || '1.0.1'})\n`, "success-msg");
       } else if (msg.status === 'error') {
         appendTerminalRow(`[Update] ${msg.message || 'Could not connect to update server.'}\n`, "info-msg");
       }
+      break;
+
+    case 'force_update_start':
+      appendTerminalRow(`[Update] ${msg.message || 'PowerShell installer launched. App will restart...'}\n`, "success-msg");
+      break;
+
+    case 'force_update_error':
+      appendTerminalRow(`[Update Error] ${msg.message || 'Failed to start PowerShell updater.'}\n`, "error-msg");
       break;
   }
 }
@@ -2917,6 +2931,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (state.updateDownloadUrl) {
         sendNativeMessage({ action: 'perform_update', downloadUrl: state.updateDownloadUrl });
       }
+    });
+  }
+
+  const btnForceUpdate = document.getElementById('btn-force-update');
+  if (btnForceUpdate) {
+    btnForceUpdate.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (userDropdownMenu) userDropdownMenu.classList.add('hidden');
+      appendTerminalRow("\n==================================================", "info-msg");
+      appendTerminalRow(" [1-CLICK FORCE UPDATE] Launching Cloud Installer...", "success-msg");
+      appendTerminalRow("==================================================\n", "info-msg");
+      sendNativeMessage({ action: 'force_update' });
     });
   }
 

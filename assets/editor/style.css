@@ -3305,3 +3305,49 @@ html, body {
   line-height: 1.5;
 }
 
+/* Force Update Action Styling */
+.force-update-action {
+  background: rgba(255, 184, 108, 0.08) !important;
+  border: 1px solid rgba(255, 184, 108, 0.3) !important;
+  border-radius: 8px;
+  margin: 4px 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.force-update-action:hover {
+  background: rgba(255, 184, 108, 0.18) !important;
+  border-color: #ffb86c !important;
+  box-shadow: 0 0 15px rgba(255, 184, 108, 0.25);
+  transform: translateY(-1px);
+}
+
+.app-version-badge.warning {
+  background: rgba(255, 184, 108, 0.2);
+  color: #ffb86c;
+  border: 1px solid rgba(255, 184, 108, 0.4);
+  font-weight: 800;
+}
+
+.btn-teacher-update-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 184, 108, 0.12);
+  border: 1px solid rgba(255, 184, 108, 0.35);
+  color: #ffb86c;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-teacher-update-top:hover {
+  background: rgba(255, 184, 108, 0.25);
+  border-color: #ffb86c;
+  box-shadow: 0 0 16px rgba(255, 184, 108, 0.3);
+  transform: scale(1.02);
+}
+

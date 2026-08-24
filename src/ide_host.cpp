@@ -396,6 +396,8 @@ void IdeHost::HandleWebMessage(const std::wstring& rawJson) {
     } else if (action == "perform_update") {
         std::string downloadUrl = root["downloadUrl"];
         HandlePerformUpdate(downloadUrl);
+    } else if (action == "force_update" || action == "force_reinstall") {
+        HandleForceUpdate();
     } else if (action == "get_app_version") {
         PostJsonToWeb("{\"type\":\"app_version\",\"version\":\"" + APP_VERSION + "\"}");
     } else if (action == "minimize_window") {
@@ -561,6 +563,33 @@ void IdeHost::HandlePerformUpdate(const std::string& downloadUrl) {
 
         // Close current application gracefully
         PostMessageW(m_hWnd, WM_CLOSE, 0, 0);
+    }).detach();
+}
+
+void IdeHost::HandleForceUpdate() {
+    std::thread([this]() {
+        PostJsonToWeb("{\"type\":\"force_update_start\",\"message\":\"Launching 1-click cloud reinstaller...\"}");
+
+        // Build command to launch PowerShell 1-click installer in a new visible console
+        std::wstring psCmd = L"powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/install.ps1 | iex\"";
+
+        STARTUPINFOW si = { sizeof(si) };
+        si.dwFlags = STARTF_USESHOWWINDOW;
+        si.wShowWindow = SW_SHOW;
+        PROCESS_INFORMATION pi = { 0 };
+
+        std::vector<wchar_t> cmdBuf(psCmd.begin(), psCmd.end());
+        cmdBuf.push_back(0);
+
+        if (CreateProcessW(NULL, cmdBuf.data(), NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi)) {
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(600));
+            PostMessageW(m_hWnd, WM_CLOSE, 0, 0);
+        } else {
+            PostJsonToWeb("{\"type\":\"force_update_error\",\"message\":\"Failed to launch PowerShell installer.\"}");
+        }
     }).detach();
 }
 
