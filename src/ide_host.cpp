@@ -15,7 +15,7 @@
 namespace fs = std::filesystem;
 using namespace Microsoft::WRL;
 
-static const std::string APP_VERSION = "1.0.0";
+static const std::string APP_VERSION = "1.0.1";
 
 // Helper: Convert wstring to string UTF-8
 static std::string WideToUtf8(const std::wstring& wstr) {
