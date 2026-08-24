@@ -3,8 +3,6 @@
 #  Usage: irm https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/install.ps1 | iex
 # ==============================================================================
 
-$ErrorActionPreference = "Stop"
-
 Write-Host ""
 Write-Host " =========================================================" -ForegroundColor Cyan
 Write-Host "   __   __ _____ ____  ____  ___ _   _  ____ " -ForegroundColor Cyan
@@ -28,22 +26,46 @@ if (-not (Test-Path $installDir)) {
 Write-Host "[1/4] Downloading latest XCODING binary..." -ForegroundColor Yellow
 try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    Invoke-WebRequest -Uri $downloadUrl -OutFile $exePath -UseBasicParsing
-    Write-Host "[SUCCESS] Downloaded to $exePath" -ForegroundColor Green
+    $webClient = New-Object System.Net.WebClient
+    $webClient.Headers.Add("User-Agent", "XCODING-Installer/1.0")
+    $webClient.DownloadFile($downloadUrl, $exePath)
+
+    # Validate file is a real binary and not a 404 HTML page
+    $fileSize = (Get-Item $exePath).Length
+    if ($fileSize -lt 100000) {
+        Remove-Item $exePath -Force -ErrorAction SilentlyContinue
+        Write-Host ""
+        Write-Host "[!] Download received invalid package ($fileSize bytes)." -ForegroundColor Red
+        Write-Host "    Reason: The GitHub repository 'GunwantBhambra/XCODING' is currently set to PRIVATE." -ForegroundColor Yellow
+        Write-Host "    Solution: Go to https://github.com/GunwantBhambra/XCODING/settings and set visibility to PUBLIC." -ForegroundColor Cyan
+        Write-Host ""
+        Read-Host "Press Enter to exit..."
+        return
+    }
+
+    Write-Host "[SUCCESS] Downloaded to $exePath ($( [math]::Round($fileSize/1MB, 2) ) MB)" -ForegroundColor Green
 } catch {
-    Write-Host "[ERROR] Download failed: $_" -ForegroundColor Red
-    exit 1
+    Write-Host ""
+    Write-Host "[ERROR] Download failed: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Note: If your repository is Private, set it to Public on GitHub to allow 1-click CLI installs." -ForegroundColor Yellow
+    Write-Host ""
+    Read-Host "Press Enter to exit..."
+    return
 }
 
 # Add to User PATH
 Write-Host "[2/4] Configuring environment PATH..." -ForegroundColor Yellow
-$userPath = [Environment]::GetEnvironmentVariable("Path", "User")
-if ($userPath -notlike "*$installDir*") {
-    [Environment]::SetEnvironmentVariable("Path", "$userPath;$installDir", "User")
-    $env:Path += ";$installDir"
-    Write-Host "[SUCCESS] Added 'xcoding' command to PATH" -ForegroundColor Green
-} else {
-    Write-Host "[INFO] PATH already configured" -ForegroundColor DarkGray
+try {
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($userPath -notlike "*$installDir*") {
+        [Environment]::SetEnvironmentVariable("Path", "$userPath;$installDir", "User")
+        $env:Path += ";$installDir"
+        Write-Host "[SUCCESS] Added 'xcoding' command to PATH" -ForegroundColor Green
+    } else {
+        Write-Host "[INFO] PATH already configured" -ForegroundColor DarkGray
+    }
+} catch {
+    Write-Host "[WARNING] Could not update PATH: $_" -ForegroundColor DarkGray
 }
 
 # Create Desktop Shortcut
