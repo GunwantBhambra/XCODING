@@ -33,16 +33,75 @@ CompilerRunner::~CompilerRunner() {
 }
 
 void CompilerRunner::FindVisualStudioPaths() {
+    m_vcvars64Path.clear();
+    m_vsDevCmdPath.clear();
+
+    // 1. Try vswhere.exe if present
+    wchar_t progFiles86[MAX_PATH] = {0};
+    if (GetEnvironmentVariableW(L"ProgramFiles(x86)", progFiles86, MAX_PATH) == 0) {
+        wcscpy_s(progFiles86, L"C:\\Program Files (x86)");
+    }
+    fs::path vswherePath = fs::path(progFiles86) / "Microsoft Visual Studio" / "Installer" / "vswhere.exe";
+    if (fs::exists(vswherePath)) {
+        std::wstring cmd = L"\"\"" + vswherePath.wstring() + L"\" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath\"";
+        FILE* pipe = _wpopen(cmd.c_str(), L"rt, ccs=UTF-8");
+        if (pipe) {
+            wchar_t buffer[1024] = {0};
+            std::wstring vsPath;
+            if (fgetws(buffer, 1024, pipe)) {
+                vsPath = buffer;
+                while (!vsPath.empty() && (vsPath.back() == L'\r' || vsPath.back() == L'\n' || vsPath.back() == L' ')) {
+                    vsPath.pop_back();
+                }
+            }
+            _pclose(pipe);
+
+            if (!vsPath.empty()) {
+                fs::path p = fs::path(vsPath) / "VC" / "Auxiliary" / "Build" / "vcvars64.bat";
+                if (fs::exists(p)) {
+                    m_vcvars64Path = p.wstring();
+                    m_vsDevCmdPath = (fs::path(vsPath) / "Common7" / "Tools" / "VsDevCmd.bat").wstring();
+                    return;
+                }
+                fs::path p32 = fs::path(vsPath) / "VC" / "Auxiliary" / "Build" / "vcvars32.bat";
+                if (fs::exists(p32)) {
+                    m_vcvars64Path = p32.wstring();
+                    m_vsDevCmdPath = (fs::path(vsPath) / "Common7" / "Tools" / "VsDevCmd.bat").wstring();
+                    return;
+                }
+                fs::path pall = fs::path(vsPath) / "VC" / "Auxiliary" / "Build" / "vcvarsall.bat";
+                if (fs::exists(pall)) {
+                    m_vcvars64Path = pall.wstring();
+                    m_vsDevCmdPath = (fs::path(vsPath) / "Common7" / "Tools" / "VsDevCmd.bat").wstring();
+                    return;
+                }
+            }
+        }
+    }
+
+    // 2. Search common Visual Studio & BuildTools directories across drives C, D, E
     const std::vector<std::wstring> potentialVsRoots = {
+        L"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community",
+        L"C:\\Program Files\\Microsoft Visual Studio\\2022\\BuildTools",
+        L"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional",
+        L"C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise",
+        L"C:\\Program Files\\Microsoft Visual Studio\\2022\\Preview",
+        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools",
+        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\Community",
+        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community",
+        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools",
+        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional",
+        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise",
+        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community",
+        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools",
         L"C:\\Program Files\\Microsoft Visual Studio\\18\\Community",
+        L"C:\\Program Files\\Microsoft Visual Studio\\18\\BuildTools",
         L"C:\\Program Files\\Microsoft Visual Studio\\18\\Enterprise",
         L"C:\\Program Files\\Microsoft Visual Studio\\18\\Professional",
-        L"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community",
-        L"C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise",
-        L"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional",
-        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community",
-        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise",
-        L"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional"
+        L"D:\\Program Files\\Microsoft Visual Studio\\2022\\Community",
+        L"D:\\Program Files\\Microsoft Visual Studio\\2022\\BuildTools",
+        L"D:\\VS2022\\Community",
+        L"D:\\VS2022\\BuildTools"
     };
 
     for (const auto& root : potentialVsRoots) {
@@ -50,7 +109,13 @@ void CompilerRunner::FindVisualStudioPaths() {
         if (fs::exists(vcvars)) {
             m_vcvars64Path = vcvars;
             m_vsDevCmdPath = root + L"\\Common7\\Tools\\VsDevCmd.bat";
-            break;
+            return;
+        }
+        std::wstring vcvarsall = root + L"\\VC\\Auxiliary\\Build\\vcvarsall.bat";
+        if (fs::exists(vcvarsall)) {
+            m_vcvars64Path = vcvarsall;
+            m_vsDevCmdPath = root + L"\\Common7\\Tools\\VsDevCmd.bat";
+            return;
         }
     }
 }
@@ -65,13 +130,14 @@ std::wstring CompilerRunner::FindProgramInPath(const std::wstring& exeName) {
 
 std::vector<ToolchainInfo> CompilerRunner::DetectToolchains() {
     m_toolchains.clear();
+    FindVisualStudioPaths();
 
     // 1. MSVC Toolchain
     ToolchainInfo msvc;
     msvc.id = "msvc";
     msvc.name = "Visual Studio MSVC (cl.exe)";
     msvc.vcvarsPath = m_vcvars64Path;
-    msvc.isAvailable = !m_vcvars64Path.empty();
+    msvc.isAvailable = !m_vcvars64Path.empty() || !FindProgramInPath(L"cl").empty();
     m_toolchains.push_back(msvc);
 
     // 2. GCC / MinGW Toolchain
@@ -83,8 +149,12 @@ std::vector<ToolchainInfo> CompilerRunner::DetectToolchains() {
         const std::vector<std::wstring> gccPaths = {
             L"C:\\msys64\\mingw64\\bin\\g++.exe",
             L"C:\\msys64\\ucrt64\\bin\\g++.exe",
+            L"C:\\msys64\\clang64\\bin\\g++.exe",
             L"C:\\MinGW\\bin\\g++.exe",
-            L"C:\\w64devkit\\bin\\g++.exe"
+            L"C:\\w64devkit\\bin\\g++.exe",
+            L"C:\\TDM-GCC-64\\bin\\g++.exe",
+            L"C:\\Strawberry\\c\\bin\\g++.exe",
+            L"C:\\winlibs\\bin\\g++.exe"
         };
         for (const auto& p : gccPaths) {
             if (fs::exists(p)) {
@@ -102,9 +172,16 @@ std::vector<ToolchainInfo> CompilerRunner::DetectToolchains() {
     clang.name = "Clang++";
     clang.compilerPath = FindProgramInPath(L"clang++");
     if (clang.compilerPath.empty()) {
-        std::wstring clangPath = L"C:\\Program Files\\LLVM\\bin\\clang++.exe";
-        if (fs::exists(clangPath)) {
-            clang.compilerPath = clangPath;
+        const std::vector<std::wstring> clangPaths = {
+            L"C:\\Program Files\\LLVM\\bin\\clang++.exe",
+            L"C:\\msys64\\clang64\\bin\\clang++.exe",
+            L"C:\\msys64\\mingw64\\bin\\clang++.exe"
+        };
+        for (const auto& p : clangPaths) {
+            if (fs::exists(p)) {
+                clang.compilerPath = p;
+                break;
+            }
         }
     }
     clang.isAvailable = !clang.compilerPath.empty();
@@ -134,7 +211,36 @@ CompileResult CompilerRunner::Compile(
     }
     fs::create_directories(workDir);
 
-    // Write a clean temporary batch job file to avoid CMD quoting issues
+    // Re-detect toolchains if necessary
+    DetectToolchains();
+
+    // Check available compilers
+    std::wstring gccPath;
+    std::wstring clangPath;
+    for (const auto& tc : m_toolchains) {
+        if (tc.id == "gcc" && tc.isAvailable) gccPath = tc.compilerPath.empty() ? L"g++" : tc.compilerPath;
+        if (tc.id == "clang" && tc.isAvailable) clangPath = tc.compilerPath.empty() ? L"clang++" : tc.compilerPath;
+    }
+
+    bool hasMsvc = !m_vcvars64Path.empty() || !FindProgramInPath(L"cl").empty();
+    bool hasGcc = !gccPath.empty();
+    bool hasClang = !clangPath.empty();
+
+    // Determine target compiler
+    std::string chosenTool = req.options.compilerId;
+    if (chosenTool.empty() || chosenTool == "msvc_cl" || chosenTool == "msvc") {
+        if (hasMsvc) {
+            chosenTool = "msvc";
+        } else if (hasGcc) {
+            chosenTool = "gcc";
+        } else if (hasClang) {
+            chosenTool = "clang";
+        } else {
+            chosenTool = "none";
+        }
+    }
+
+    // Write temporary batch job file
     std::wstring batchPath = workDir + L"\\compile_job.bat";
     std::ofstream batFile(batchPath, std::ios::out);
     if (!batFile.is_open()) {
@@ -143,22 +249,36 @@ CompileResult CompilerRunner::Compile(
     }
 
     batFile << "@echo off\n";
-    if (req.options.compilerId == "gcc" || req.options.compilerId == "clang") {
-        std::string comp = (req.options.compilerId == "gcc") ? "g++" : "clang++";
+
+    if (chosenTool == "none") {
+        batFile << "echo ================================================================================\n";
+        batFile << "echo  [XCODING COMPILER DETECTOR] No C++ compiler detected on this computer.\n";
+        batFile << "echo ================================================================================\n";
+        batFile << "echo.\n";
+        batFile << "echo  To compile and execute C++ programs in XCODING, please install a compiler:\n";
+        batFile << "echo.\n";
+        batFile << "echo  [Option 1: MSVC C++ Build Tools (Recommended)]\n";
+        batFile << "echo    Run in PowerShell (Admin):\n";
+        batFile << "echo    winget install Microsoft.VisualStudio.2022.BuildTools --override \"--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --passive\"\n";
+        batFile << "echo.\n";
+        batFile << "echo  [Option 2: MinGW-w64 GCC (Lightweight)]\n";
+        batFile << "echo    Run in PowerShell:\n";
+        batFile << "echo    winget install MSYS2.MSYS2\n";
+        batFile << "echo.\n";
+        batFile << "exit /b 1\n";
+    } else if (chosenTool == "gcc" || chosenTool == "clang") {
+        std::wstring compExe = (chosenTool == "gcc") ? (gccPath.empty() ? L"g++" : gccPath) : (clangPath.empty() ? L"clang++" : clangPath);
         std::string stdGcc = "-std=c++20";
         if (req.options.cppStandard == "c++17") stdGcc = "-std=c++17";
         else if (req.options.cppStandard == "c++23") stdGcc = "-std=c++23";
         else if (req.options.cppStandard == "c++14") stdGcc = "-std=c++14";
-        batFile << comp << " " << stdGcc << " -Wall -g \"" << WideToUtf8Str(req.sourceFilePath) << "\" -o \"" << WideToUtf8Str(req.outputExePath) << "\"\n";
-    } else {
-        std::wstring vcvars = m_vcvars64Path;
-        if (vcvars.empty()) {
-            FindVisualStudioPaths();
-            vcvars = m_vcvars64Path;
-        }
-        batFile << "call \"" << WideToUtf8Str(vcvars) << "\" >nul 2>&1\n";
-        batFile << "if errorlevel 1 exit /b 1\n";
 
+        batFile << "\"" << WideToUtf8Str(compExe) << "\" " << stdGcc << " -Wall -O2 \"" << WideToUtf8Str(req.sourceFilePath) << "\" -o \"" << WideToUtf8Str(req.outputExePath) << "\"\n";
+    } else {
+        // MSVC
+        if (!m_vcvars64Path.empty()) {
+            batFile << "call \"" << WideToUtf8Str(m_vcvars64Path) << "\" >nul 2>&1\n";
+        }
         std::string standardFlag = "/std:c++20";
         if (req.options.cppStandard == "c++17") standardFlag = "/std:c++17";
         else if (req.options.cppStandard == "c++23" || req.options.cppStandard == "c++latest") standardFlag = "/std:c++latest";

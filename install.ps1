@@ -132,6 +132,30 @@
         Write-Host "[SUCCESS] Desktop shortcut created!" -ForegroundColor Green
     } catch {}
 
+    # Check if a C++ compiler is installed on this machine
+    $hasCompiler = $false
+    if (Get-Command cl.exe -ErrorAction SilentlyContinue) { $hasCompiler = $true }
+    elseif (Get-Command g++.exe -ErrorAction SilentlyContinue) { $hasCompiler = $true }
+    elseif (Get-Command clang++.exe -ErrorAction SilentlyContinue) { $hasCompiler = $true }
+    elseif (Test-Path "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat") { $hasCompiler = $true }
+    elseif (Test-Path "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat") { $hasCompiler = $true }
+    elseif (Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat") { $hasCompiler = $true }
+    elseif (Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat") { $hasCompiler = $true }
+    elseif (Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat") { $hasCompiler = $true }
+    elseif (Test-Path "C:\msys64\mingw64\bin\g++.exe") { $hasCompiler = $true }
+
+    if (-not $hasCompiler) {
+        Write-Host ""
+        Write-Host "=========================================================" -ForegroundColor Yellow
+        Write-Host " [NOTICE] No C++ Compiler Detected on this PC" -ForegroundColor Yellow
+        Write-Host "=========================================================" -ForegroundColor Yellow
+        Write-Host " XCODING needs a compiler (MSVC or MinGW) to run code." -ForegroundColor White
+        Write-Host " You can install MSVC Build Tools automatically with:" -ForegroundColor Cyan
+        Write-Host "   winget install Microsoft.VisualStudio.2022.BuildTools --override `"--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --passive`"" -ForegroundColor Green
+        Write-Host "=========================================================" -ForegroundColor Yellow
+        Write-Host ""
+    }
+
     Write-Host "[4/4] Launching XCODING..." -ForegroundColor Cyan
     try {
         Start-Process $exePath
