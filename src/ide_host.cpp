@@ -6,11 +6,13 @@
 #include <filesystem>
 #include <commdlg.h>
 #include <shlobj.h>
+#include <shellapi.h>
 #include <wininet.h>
 #include <urlmon.h>
 
 #pragma comment(lib, "Wininet.lib")
 #pragma comment(lib, "Urlmon.lib")
+#pragma comment(lib, "Shell32.lib")
 
 namespace fs = std::filesystem;
 using namespace Microsoft::WRL;
@@ -568,27 +570,60 @@ void IdeHost::HandlePerformUpdate(const std::string& downloadUrl) {
 
 void IdeHost::HandleForceUpdate() {
     std::thread([this]() {
-        PostJsonToWeb("{\"type\":\"force_update_start\",\"message\":\"Launching 1-click cloud reinstaller...\"}");
+        PostJsonToWeb("{\"type\":\"force_update_start\",\"message\":\"Launching 1-click cloud installer...\"}");
 
-        // Build command to launch PowerShell 1-click installer in a new visible console
-        std::wstring psCmd = L"powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/install.ps1 | iex\"";
+        // Write helper update batch file to %TEMP%\xcoding_updater.bat
+        wchar_t tempPath[MAX_PATH];
+        GetTempPathW(MAX_PATH, tempPath);
+        fs::path batPath = fs::path(tempPath) / "xcoding_updater.bat";
 
-        STARTUPINFOW si = { sizeof(si) };
-        si.dwFlags = STARTF_USESHOWWINDOW;
-        si.wShowWindow = SW_SHOW;
-        PROCESS_INFORMATION pi = { 0 };
+        std::ofstream ofs(batPath);
+        if (ofs.is_open()) {
+            ofs << "@echo off\n";
+            ofs << "title XCODING 1-Click Cloud Updater\n";
+            ofs << "echo =========================================================\n";
+            ofs << "echo  Starting XCODING 1-Click Cloud Reinstall / Update\n";
+            ofs << "echo =========================================================\n";
+            ofs << "timeout /t 1 /nobreak >nul\n";
+            ofs << "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/install.ps1 | iex\"\n";
+            ofs << "if errorlevel 1 (\n";
+            ofs << "    echo.\n";
+            ofs << "    echo [ERROR] Update encountered an issue. Press any key to exit.\n";
+            ofs << "    pause >nul\n";
+            ofs << ")\n";
+            ofs.close();
+        }
 
-        std::vector<wchar_t> cmdBuf(psCmd.begin(), psCmd.end());
-        cmdBuf.push_back(0);
+        // Launch the batch updater using ShellExecuteW
+        HINSTANCE hInst = ShellExecuteW(
+            NULL,
+            L"open",
+            batPath.wstring().c_str(),
+            NULL,
+            NULL,
+            SW_SHOW
+        );
 
-        if (CreateProcessW(NULL, cmdBuf.data(), NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi)) {
-            CloseHandle(pi.hProcess);
-            CloseHandle(pi.hThread);
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(600));
+        if ((INT_PTR)hInst > 32) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(800));
             PostMessageW(m_hWnd, WM_CLOSE, 0, 0);
         } else {
-            PostJsonToWeb("{\"type\":\"force_update_error\",\"message\":\"Failed to launch PowerShell installer.\"}");
+            // Fallback: try direct powershell ShellExecute
+            HINSTANCE hPs = ShellExecuteW(
+                NULL,
+                L"open",
+                L"powershell.exe",
+                L"-NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/install.ps1 | iex\"",
+                NULL,
+                SW_SHOW
+            );
+
+            if ((INT_PTR)hPs > 32) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(800));
+                PostMessageW(m_hWnd, WM_CLOSE, 0, 0);
+            } else {
+                PostJsonToWeb("{\"type\":\"force_update_error\",\"message\":\"Failed to launch updater process.\"}");
+            }
         }
     }).detach();
 }
