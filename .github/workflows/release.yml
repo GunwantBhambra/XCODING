@@ -38,10 +38,16 @@ jobs:
         run: |
           cmd.exe /c "build.bat"
 
+      - name: Create ZIP Release Package
+        run: |
+          powershell -Command "Compress-Archive -Path bin\* -DestinationPath bin\XCODING_windows_x64.zip -Force"
+
       - name: Create GitHub Release & Upload Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: bin/XCODING.exe
+          files: |
+            bin/XCODING.exe
+            bin/XCODING_windows_x64.zip
           tag_name: ${{ github.ref_name || github.event.inputs.version }}
           name: XCODING ${{ github.ref_name || github.event.inputs.version }}
           body: |
