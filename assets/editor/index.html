@@ -114,24 +114,57 @@
 
               <!-- Dropdown Menu -->
               <div id="user-dropdown-menu" class="user-dropdown-menu hidden">
+                <!-- User Profile Header -->
                 <div class="dropdown-user-header">
-                  <div class="dropdown-user-name" id="dropdown-user-name">Student Account</div>
-                  <div class="dropdown-user-email" id="dropdown-user-email">Offline Guest</div>
+                  <div class="dropdown-avatar-wrap">
+                    <span class="dropdown-avatar-circle" id="dropdown-avatar-text">G</span>
+                    <span class="status-indicator-dot" title="Cloud Sync Active"></span>
+                  </div>
+                  <div class="dropdown-user-details">
+                    <div class="dropdown-user-name" id="dropdown-user-name">Student Account</div>
+                    <div class="dropdown-user-email" id="dropdown-user-email">Offline Guest</div>
+                  </div>
                 </div>
-                <div class="dropdown-divider"></div>
-                <div class="dropdown-stat-line">
-                  <span>Total Compiles:</span> <strong id="dropdown-compiles">0</strong>
+
+                <!-- 2x2 Cyber Metrics Cards -->
+                <div class="dropdown-stats-grid">
+                  <div class="stat-mini-card">
+                    <div class="stat-mini-label">COMPILES</div>
+                    <div class="stat-mini-val" id="dropdown-compiles">0</div>
+                  </div>
+                  <div class="stat-mini-card">
+                    <div class="stat-mini-label">RUNS</div>
+                    <div class="stat-mini-val" id="dropdown-runs">0</div>
+                  </div>
+                  <div class="stat-mini-card">
+                    <div class="stat-mini-label">CLEARED</div>
+                    <div class="stat-mini-val emerald" id="dropdown-cleared">0 / 10</div>
+                  </div>
+                  <div class="stat-mini-card">
+                    <div class="stat-mini-label">STATUS</div>
+                    <div class="stat-mini-val cyan" id="dropdown-status">ONLINE</div>
+                  </div>
                 </div>
-                <div class="dropdown-stat-line">
-                  <span>Total Runs:</span> <strong id="dropdown-runs">0</strong>
+
+                <!-- Menu Actions -->
+                <div class="dropdown-actions-group">
+                  <button id="btn-check-updates" class="dropdown-action-item" title="Check for application updates">
+                    <div class="action-item-left">
+                      <svg class="action-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                      </svg>
+                      <span>Check for Updates</span>
+                    </div>
+                    <span class="app-version-badge" id="dropdown-version-tag">v1.0.0</span>
+                  </button>
+
+                  <button id="btn-logout" class="dropdown-logout-action" title="Sign out of student account">
+                    <svg class="logout-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                    </svg>
+                    <span>Sign Out</span>
+                  </button>
                 </div>
-                <div class="dropdown-divider"></div>
-                <button id="btn-check-updates" class="dropdown-item-btn" title="Check for application updates">
-                  <span>Check for Updates</span>
-                  <span class="app-version-badge" id="dropdown-version-tag">v1.0.0</span>
-                </button>
-                <div class="dropdown-divider"></div>
-                <button id="btn-logout" class="dropdown-logout-btn">Sign Out</button>
               </div>
             </div>
           </div>

@@ -1735,13 +1735,17 @@ function updateUIWithUser(user, tally) {
 
   const nameEl = document.getElementById('user-display-name');
   const avatarEl = document.getElementById('user-avatar-text');
+  const dropAvatar = document.getElementById('dropdown-avatar-text');
   const dropName = document.getElementById('dropdown-user-name');
   const dropEmail = document.getElementById('dropdown-user-email');
+  const dropStatus = document.getElementById('dropdown-status');
 
   if (nameEl) nameEl.textContent = displayName.toUpperCase();
   if (avatarEl) avatarEl.textContent = firstLetter;
+  if (dropAvatar) dropAvatar.textContent = firstLetter;
   if (dropName) dropName.textContent = displayName;
   if (dropEmail) dropEmail.textContent = user.email || "Offline Student";
+  if (dropStatus) dropStatus.textContent = (user.uid && !user.uid.startsWith('guest_')) ? "SYNCED" : "OFFLINE";
 }
 
 function updateTallyUI() {
@@ -1749,11 +1753,15 @@ function updateTallyUI() {
   const elRuns = document.getElementById('tally-runs');
   const dropComp = document.getElementById('dropdown-compiles');
   const dropRuns = document.getElementById('dropdown-runs');
+  const dropCleared = document.getElementById('dropdown-cleared');
 
   if (elCompiles) elCompiles.textContent = state.tally.totalCompiles;
   if (elRuns) elRuns.textContent = state.tally.totalRuns;
   if (dropComp) dropComp.textContent = state.tally.totalCompiles;
   if (dropRuns) dropRuns.textContent = state.tally.totalRuns;
+  if (dropCleared && state.game && state.game.completedLevels) {
+    dropCleared.textContent = `${state.game.completedLevels.length} / ${LEVELS.length}`;
+  }
 }
 
 function saveMetaSession() {
