@@ -795,15 +795,46 @@ void IdeHost::HandleRunTestSuite(
                 durationMs
             );
 
-            auto trim = [](std::string s) {
-                while (!s.empty() && (s.back() == '\r' || s.back() == '\n' || s.back() == ' ' || s.back() == '\t')) s.pop_back();
+            auto normalizeOutput = [](const std::string& raw) -> std::string {
+                // 1. Remove all '\r' carriage returns (Windows CRLF normalization)
+                std::string s;
+                s.reserve(raw.size());
+                for (char c : raw) {
+                    if (c != '\r') {
+                        s.push_back(c);
+                    }
+                }
+
+                // 2. Trim trailing whitespace from each line
+                std::string result;
+                std::istringstream iss(s);
+                std::string line;
+                bool first = true;
+                while (std::getline(iss, line)) {
+                    while (!line.empty() && (line.back() == ' ' || line.back() == '\t')) {
+                        line.pop_back();
+                    }
+                    if (!first) result += "\n";
+                    result += line;
+                    first = false;
+                }
+
+                // 3. Trim leading & trailing newlines/whitespace
+                while (!result.empty() && (result.back() == '\n' || result.back() == ' ' || result.back() == '\t')) {
+                    result.pop_back();
+                }
                 size_t start = 0;
-                while (start < s.size() && (s[start] == '\r' || s[start] == '\n' || s[start] == ' ' || s[start] == '\t')) start++;
-                return s.substr(start);
+                while (start < result.size() && (result[start] == '\n' || result[start] == ' ' || result[start] == '\t')) {
+                    start++;
+                }
+                if (start > 0) {
+                    result = result.substr(start);
+                }
+                return result;
             };
 
-            std::string trimmedActual = trim(actualOut);
-            std::string trimmedExpected = trim(expected);
+            std::string trimmedActual = normalizeOutput(actualOut);
+            std::string trimmedExpected = normalizeOutput(expected);
             bool testPassed = (ok && exitCode == 0 && trimmedActual == trimmedExpected);
             if (testPassed) passedCount++;
 
