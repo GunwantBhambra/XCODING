@@ -1,5 +1,5 @@
 & {
-    $ErrorActionPreference = "Stop"
+    $ErrorActionPreference = "Continue"
 
     Write-Host ""
     Write-Host " =========================================================" -ForegroundColor Cyan
@@ -13,7 +13,6 @@
     Write-Host ""
 
     $installDir = "$env:LOCALAPPDATA\Programs\XCODING"
-    $tempZip = "$env:TEMP\XCODING_windows_x64.zip"
     $exePath = "$installDir\XCODING.exe"
 
     # Terminate any running IDE instances so binaries can be overwritten
@@ -49,6 +48,10 @@
     Write-Host "[2/4] Downloading and extracting XCODING package..." -ForegroundColor Yellow
     $downloadSuccess = $false
 
+    $stagingDir = "$env:TEMP\XCODING_staging_$([System.Guid]::NewGuid().ToString('N').Substring(0,8))"
+    New-Item -ItemType Directory -Path $stagingDir -Force | Out-Null
+    $tempZip = "$stagingDir\XCODING_package.zip"
+
     foreach ($url in $urlsToTry) {
         try {
             Write-Host "  -> Fetching from: $url" -ForegroundColor DarkGray
@@ -68,14 +71,48 @@
             $resp.Close()
 
             if ((Test-Path $tempZip) -and ((Get-Item $tempZip).Length -gt 1000000)) {
-                try {
-                    Expand-Archive -Path $tempZip -DestinationPath $installDir -Force
-                } catch {
-                    Get-Process -Name "XCODING", "XCODING_TEACHER", "CodeFork" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-                    Start-Sleep -Seconds 1
-                    Expand-Archive -Path $tempZip -DestinationPath $installDir -Force
+                $extractStaging = "$stagingDir\extracted"
+                New-Item -ItemType Directory -Path $extractStaging -Force | Out-Null
+                Expand-Archive -Path $tempZip -DestinationPath $extractStaging -Force
+
+                # Atomic copy into $installDir
+                Get-ChildItem -Path $extractStaging -Recurse | ForEach-Object {
+                    $relPath = $_.FullName.Substring($extractStaging.Length).TrimStart('\', '/')
+                    $targetPath = Join-Path $installDir $relPath
+                    
+                    if ($_.PSIsContainer) {
+                        if (-not (Test-Path $targetPath)) { New-Item -ItemType Directory -Path $targetPath -Force | Out-Null }
+                    } else {
+                        $targetParent = Split-Path $targetPath -Parent
+                        if (-not (Test-Path $targetParent)) { New-Item -ItemType Directory -Path $targetParent -Force | Out-Null }
+                        
+                        $copied = $false
+                        for ($attempt = 1; $attempt -le 3; $attempt++) {
+                            try {
+                                Copy-Item -Path $_.FullName -Destination $targetPath -Force -ErrorAction Stop
+                                $copied = $true
+                                break
+                            } catch {
+                                if (Test-Path $targetPath) {
+                                    $oldPath = "$targetPath.old.$([System.Guid]::NewGuid().ToString('N').Substring(0,4))"
+                                    try {
+                                        Rename-Item -Path $targetPath -NewName (Split-Path $oldPath -Leaf) -Force -ErrorAction SilentlyContinue
+                                        Copy-Item -Path $_.FullName -Destination $targetPath -Force -ErrorAction Stop
+                                        $copied = $true
+                                        break
+                                    } catch {
+                                        Start-Sleep -Milliseconds 400
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-                Remove-Item $tempZip -Force -ErrorAction SilentlyContinue
+
+                # Cleanup
+                Get-ChildItem -Path $installDir -Filter "*.old.*" -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path $stagingDir -Recurse -Force -ErrorAction SilentlyContinue
+                
                 $downloadSuccess = $true
                 Write-Host "[SUCCESS] Package installed successfully to $installDir" -ForegroundColor Green
                 break
