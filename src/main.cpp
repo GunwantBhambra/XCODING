@@ -21,19 +21,31 @@ namespace fs = std::filesystem;
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
 #endif
 
+#ifdef XCODING_TEACHER_BUILD
+#define XCODING_APP_DIR_NAME "XCODING_TEACHER"
+#define XCODING_HTML_FILE "teacher.html"
+#define XCODING_CLASS_NAME L"XCODING_TEACHER_WindowClass"
+#define XCODING_APP_TITLE L"XCODING - Teacher Edition & Live Student Inspector"
+#else
+#define XCODING_APP_DIR_NAME "XCODING"
+#define XCODING_HTML_FILE "index.html"
+#define XCODING_CLASS_NAME L"XCODING_WindowClass"
+#define XCODING_APP_TITLE L"XCODING"
+#endif
+
 static IdeHost* g_pIdeHost = nullptr;
 
 static std::wstring GetXcodingAppDataDir() {
     wchar_t localAppData[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, localAppData))) {
-        fs::path p = fs::path(localAppData) / "XCODING";
+        fs::path p = fs::path(localAppData) / XCODING_APP_DIR_NAME;
         std::error_code ec;
         fs::create_directories(p, ec);
         return p.wstring();
     }
     wchar_t tempPath[MAX_PATH];
     GetTempPathW(MAX_PATH, tempPath);
-    fs::path p = fs::path(tempPath) / "XCODING";
+    fs::path p = fs::path(tempPath) / XCODING_APP_DIR_NAME;
     std::error_code ec;
     fs::create_directories(p, ec);
     return p.wstring();
@@ -44,15 +56,15 @@ static std::wstring EnsureAssetsExtracted(HINSTANCE hInstance) {
     GetModuleFileNameW(NULL, exePathBuffer, MAX_PATH);
     fs::path exeDir = fs::path(exePathBuffer).parent_path();
 
-    // 1. Check if assets/editor/index.html exists adjacent to the exe
-    fs::path localHtml = exeDir / "assets" / "editor" / "index.html";
+    // 1. Check if assets/editor/XCODING_HTML_FILE exists adjacent to the exe
+    fs::path localHtml = exeDir / "assets" / "editor" / XCODING_HTML_FILE;
     if (fs::exists(localHtml)) {
         return localHtml.wstring();
     }
 
-    // 2. Fallback check in %LOCALAPPDATA%\XCODING\assets
+    // 2. Fallback check in %LOCALAPPDATA%\...
     fs::path appDataDir = fs::path(GetXcodingAppDataDir());
-    fs::path appDataHtml = appDataDir / "assets" / "editor" / "index.html";
+    fs::path appDataHtml = appDataDir / "assets" / "editor" / XCODING_HTML_FILE;
     if (fs::exists(appDataHtml)) {
         return appDataHtml.wstring();
     }
@@ -171,7 +183,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     HRESULT hrCoInit = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
-    const wchar_t CLASS_NAME[] = L"XCODING_WindowClass";
+    const wchar_t* CLASS_NAME = XCODING_CLASS_NAME;
 
     HICON hAppIcon = (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_APP_ICON), IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
     HICON hAppIconSm = (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_APP_ICON), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
@@ -190,7 +202,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     wc.hIconSm = hAppIconSm;
 
     if (!RegisterClassExW(&wc)) {
-        MessageBoxW(NULL, L"Failed to register window class.", L"XCODING Error", MB_OK | MB_ICONERROR);
+        MessageBoxW(NULL, L"Failed to register window class.", XCODING_APP_TITLE, MB_OK | MB_ICONERROR);
         return 1;
     }
 
@@ -205,7 +217,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     int windowY = workArea.top + (workHeight - windowHeight) / 2;
     bool isMaximized = false;
 
-    // Restore saved window size & position from %LOCALAPPDATA%\XCODING\.window_state
+    // Restore saved window size & position from %LOCALAPPDATA%\...
     fs::path winStatePath = fs::path(GetXcodingAppDataDir()) / ".window_state";
     if (fs::exists(winStatePath)) {
         std::ifstream ifs(winStatePath);
@@ -226,7 +238,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     HWND hWnd = CreateWindowExW(
         WS_EX_APPWINDOW,
         CLASS_NAME,
-        L"XCODING",
+        XCODING_APP_TITLE,
         WS_OVERLAPPEDWINDOW,
         windowX, windowY, windowWidth, windowHeight,
         NULL,

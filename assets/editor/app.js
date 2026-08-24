@@ -1382,6 +1382,8 @@ const state = {
     levelAttempts: {},
     levelCode: {}
   },
+  leaderboardData: [],
+  leaderboardSearch: '',
   progressTimer: null,
   history: [],
   historyIndex: -1
@@ -1766,6 +1768,8 @@ function switchView(viewName) {
     }, 50);
   } else if (viewName === 'levels') {
     renderLevelsMap();
+  } else if (viewName === 'leaderboard') {
+    loadLeaderboardFromFirebase();
   }
 }
 
@@ -1930,6 +1934,220 @@ function renderLevelsMap() {
     }
 
     container.appendChild(card);
+  });
+}
+
+// ==========================================================================
+// Leaderboard & Cloud Progress Analytics (Direct Realtime Database Sync)
+// ==========================================================================
+function formatTimeAgo(dateStr) {
+  if (!dateStr) return "Offline";
+  try {
+    const d = new Date(dateStr);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (isNaN(diff) || diff < 0) return "Just now";
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+    return d.toLocaleDateString();
+  } catch(e) {
+    return "Recently";
+  }
+}
+
+async function loadLeaderboardFromFirebase() {
+  const refreshBtn = document.getElementById('btn-refresh-leaderboard');
+  if (refreshBtn) refreshBtn.classList.add('spinning');
+
+  try {
+    const res = await fetch(`${RTDB_URL}/students.json`);
+    let studentMap = {};
+    if (res.ok) {
+      studentMap = (await res.json()) || {};
+    }
+
+    let students = Object.values(studentMap).filter(s => s && typeof s === 'object');
+
+    // Ensure current student is reflected in live leaderboard
+    const currentUid = (state.currentUser && state.currentUser.uid) || localStorage.getItem('xcoding_guest_uid');
+    if (currentUid) {
+      const idx = students.findIndex(s => s.uid === currentUid);
+      const curData = {
+        uid: currentUid,
+        displayName: (state.currentUser && state.currentUser.displayName) || "You (Student)",
+        email: (state.currentUser && state.currentUser.email) || "Local Student",
+        completedLevels: state.game.completedLevels || [],
+        currentLevel: state.game.currentLevel || 1,
+        unlockedLevel: state.game.unlockedLevel || 1,
+        tally: state.tally || {},
+        lastSynced: new Date().toISOString()
+      };
+      if (idx >= 0) {
+        students[idx] = Object.assign({}, students[idx], curData);
+      } else {
+        students.push(curData);
+      }
+    }
+
+    // Sort: Cleared levels DESC, totalRuns DESC, totalCompiles DESC, lastSynced DESC
+    students.sort((a, b) => {
+      const aCleared = Array.isArray(a.completedLevels) ? a.completedLevels.length : 0;
+      const bCleared = Array.isArray(b.completedLevels) ? b.completedLevels.length : 0;
+      if (bCleared !== aCleared) return bCleared - aCleared;
+
+      const aRuns = (a.tally && a.tally.totalRuns) || 0;
+      const bRuns = (b.tally && b.tally.totalRuns) || 0;
+      if (bRuns !== aRuns) return bRuns - aRuns;
+
+      const aComp = (a.tally && a.tally.totalCompiles) || 0;
+      const bComp = (b.tally && b.tally.totalCompiles) || 0;
+      if (bComp !== aComp) return bComp - aComp;
+
+      const aTime = a.lastSynced ? new Date(a.lastSynced).getTime() : 0;
+      const bTime = b.lastSynced ? new Date(b.lastSynced).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    state.leaderboardData = students;
+    renderLeaderboard();
+  } catch (err) {
+    console.error("Failed to load leaderboard:", err);
+  } finally {
+    if (refreshBtn) {
+      setTimeout(() => refreshBtn.classList.remove('spinning'), 500);
+    }
+  }
+}
+
+function renderLeaderboard() {
+  const students = state.leaderboardData || [];
+  const currentUid = (state.currentUser && state.currentUser.uid) || localStorage.getItem('xcoding_guest_uid');
+
+  // Compute Top Summary Metrics
+  const elTotal = document.getElementById('lb-stat-students');
+  const elTop = document.getElementById('lb-stat-topscore');
+  const elAvg = document.getElementById('lb-stat-avg');
+  const elYourRank = document.getElementById('lb-stat-yourrank');
+  const elYourScore = document.getElementById('lb-stat-yourscore');
+
+  if (elTotal) elTotal.textContent = students.length;
+
+  const maxScore = students.length > 0
+    ? (Array.isArray(students[0].completedLevels) ? students[0].completedLevels.length : 0)
+    : 0;
+  if (elTop) elTop.textContent = `${maxScore} / ${LEVELS.length}`;
+
+  const totalClearedAll = students.reduce((acc, s) => acc + (Array.isArray(s.completedLevels) ? s.completedLevels.length : 0), 0);
+  const avgPct = students.length > 0 ? Math.round((totalClearedAll / (students.length * LEVELS.length)) * 100) : 0;
+  if (elAvg) elAvg.textContent = `${avgPct}%`;
+
+  const userRankIdx = currentUid ? students.findIndex(s => s.uid === currentUid) : -1;
+  const userClearedCount = (state.game && state.game.completedLevels) ? state.game.completedLevels.length : 0;
+  if (elYourRank) elYourRank.textContent = userRankIdx >= 0 ? `#${userRankIdx + 1}` : "#--";
+  if (elYourScore) elYourScore.textContent = `${userClearedCount} / ${LEVELS.length} Cleared`;
+
+  // Render Top 3 Podium
+  const podiumContainer = document.getElementById('leaderboard-podium');
+  if (podiumContainer) {
+    podiumContainer.innerHTML = "";
+    if (students.length >= 1) {
+      const top3 = [
+        { rank: 2, data: students[1], class: "silver", label: "2ND" },
+        { rank: 1, data: students[0], class: "gold", label: "1ST" },
+        { rank: 3, data: students[2], class: "bronze", label: "3RD" }
+      ];
+
+      top3.forEach(item => {
+        if (!item.data) return;
+        const s = item.data;
+        const cleared = Array.isArray(s.completedLevels) ? s.completedLevels.length : 0;
+        const name = s.displayName || s.email || `Student ${item.rank}`;
+        const initial = name.charAt(0).toUpperCase();
+
+        const card = document.createElement('div');
+        card.className = `podium-card ${item.class}`;
+        card.innerHTML = `
+          <div class="podium-rank-badge">${item.label}</div>
+          <div class="podium-avatar">${initial}</div>
+          <div class="podium-name" title="${name}">${name}</div>
+          <div class="podium-score"><strong>${cleared}</strong> / ${LEVELS.length} Cleared</div>
+          <div class="podium-sub">${(s.tally && s.tally.totalRuns) || 0} runs • ${formatTimeAgo(s.lastSynced)}</div>
+        `;
+        podiumContainer.appendChild(card);
+      });
+    }
+  }
+
+  // Filter top 50 according to search query
+  const query = (state.leaderboardSearch || '').toLowerCase().trim();
+  const filtered = students.filter(s => {
+    if (!query) return true;
+    const name = (s.displayName || '').toLowerCase();
+    const email = (s.email || '').toLowerCase();
+    return name.includes(query) || email.includes(query);
+  });
+
+  const top50 = filtered.slice(0, 50);
+
+  const tableBody = document.getElementById('leaderboard-table-rows');
+  if (!tableBody) return;
+  tableBody.innerHTML = "";
+
+  if (top50.length === 0) {
+    tableBody.innerHTML = `<div class="leaderboard-empty">No students found matching "${query}".</div>`;
+    return;
+  }
+
+  top50.forEach((s) => {
+    const rank = students.indexOf(s) + 1;
+    const cleared = Array.isArray(s.completedLevels) ? s.completedLevels.length : 0;
+    const pct = Math.round((cleared / LEVELS.length) * 100);
+    const name = s.displayName || (s.email ? s.email.split('@')[0] : "Student");
+    const email = s.email || "Offline Student";
+    const initial = name.charAt(0).toUpperCase();
+    const runs = (s.tally && s.tally.totalRuns) || 0;
+    const compiles = (s.tally && s.tally.totalCompiles) || 0;
+    const timeAgoStr = formatTimeAgo(s.lastSynced);
+    const isCurrentUser = s.uid === currentUid;
+
+    let rankBadgeClass = "rank-num";
+    let rankText = `#${rank}`;
+    if (rank === 1) { rankBadgeClass = "rank-badge gold"; rankText = "👑 1"; }
+    else if (rank === 2) { rankBadgeClass = "rank-badge silver"; rankText = "🥈 2"; }
+    else if (rank === 3) { rankBadgeClass = "rank-badge bronze"; rankText = "🥉 3"; }
+    else if (rank <= 10) { rankBadgeClass = "rank-badge top10"; rankText = `#${rank}`; }
+
+    const row = document.createElement('div');
+    row.className = `leaderboard-table-row ${isCurrentUser ? 'current-user-row' : ''}`;
+    row.innerHTML = `
+      <div class="col-rank">
+        <span class="${rankBadgeClass}">${rankText}</span>
+      </div>
+      <div class="col-user">
+        <div class="lb-avatar">${initial}</div>
+        <div class="lb-user-details">
+          <div class="lb-user-name">${name} ${isCurrentUser ? '<span class="you-tag">YOU</span>' : ''}</div>
+          <div class="lb-user-email">${email}</div>
+        </div>
+      </div>
+      <div class="col-progress">
+        <div class="lb-progress-bar-wrap">
+          <div class="lb-progress-bar-fill" style="width: ${pct}%"></div>
+        </div>
+        <span class="lb-progress-pct">${pct}%</span>
+      </div>
+      <div class="col-score">
+        <span class="score-pill">${cleared} / ${LEVELS.length}</span>
+      </div>
+      <div class="col-runs">
+        <span class="runs-text"><strong>${runs}</strong> runs <span class="dim">|</span> ${compiles} comp</span>
+      </div>
+      <div class="col-time">
+        <span class="time-text">${timeAgoStr}</span>
+      </div>
+    `;
+    tableBody.appendChild(row);
   });
 }
 
@@ -2526,11 +2744,25 @@ document.addEventListener('DOMContentLoaded', () => {
   setupLinkedScrollZoom();
   renderLevelTrain();
 
-  // Navigation Tabs: Studio and Levels
+  // Navigation Tabs: Studio, Levels, and Leaderboard
   const tabStudio = document.getElementById('tab-studio');
   const tabLevels = document.getElementById('tab-levels');
+  const tabLeaderboard = document.getElementById('tab-leaderboard');
   if (tabStudio) tabStudio.addEventListener('click', () => switchView('studio'));
   if (tabLevels) tabLevels.addEventListener('click', () => switchView('levels'));
+  if (tabLeaderboard) tabLeaderboard.addEventListener('click', () => switchView('leaderboard'));
+
+  // Leaderboard Controls
+  const btnRefreshLb = document.getElementById('btn-refresh-leaderboard');
+  if (btnRefreshLb) btnRefreshLb.addEventListener('click', loadLeaderboardFromFirebase);
+
+  const searchLbInput = document.getElementById('leaderboard-search-input');
+  if (searchLbInput) {
+    searchLbInput.addEventListener('input', (e) => {
+      state.leaderboardSearch = e.target.value;
+      renderLeaderboard();
+    });
+  }
 
   // Studio Header Actions
   const btnRun = document.getElementById('btn-run');

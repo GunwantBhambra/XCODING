@@ -20,45 +20,89 @@
         New-Item -ItemType Directory -Path $installDir -Force | Out-Null
     }
 
-    Write-Host "[1/4] Finding release package from GitHub..." -ForegroundColor Yellow
-    $zipUrl = "https://github.com/GunwantBhambra/XCODING/releases/download/v1.0.0/XCODING_windows_x64.zip"
-    $exeFallbackUrl = "https://github.com/GunwantBhambra/XCODING/releases/download/v1.0.0/XCODING.exe"
+    Write-Host "[1/4] Resolving release download source..." -ForegroundColor Yellow
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+    $urlsToTry = @(
+        "https://github.com/GunwantBhambra/XCODING/releases/latest/download/XCODING_windows_x64.zip",
+        "https://github.com/GunwantBhambra/XCODING/raw/main/XCODING_windows_x64.zip",
+        "https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/bin/XCODING_windows_x64.zip",
+        "https://github.com/GunwantBhambra/XCODING/releases/download/v1.0.1/XCODING_windows_x64.zip"
+    )
 
     try {
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/GunwantBhambra/XCODING/releases" -Headers @{"User-Agent"="Mozilla/5.0"}
-        if ($releases.Count -gt 0) {
+        if ($releases -and $releases.Count -gt 0) {
             foreach ($asset in $releases[0].assets) {
                 if ($asset.name -like "*.zip") {
-                    $zipUrl = $asset.browser_download_url
+                    $urlsToTry = @($asset.browser_download_url) + $urlsToTry
                     break
                 }
             }
         }
     } catch {}
 
-    Write-Host "[2/4] Downloading XCODING release package..." -ForegroundColor Yellow
+    Write-Host "[2/4] Downloading and extracting XCODING package..." -ForegroundColor Yellow
     $downloadSuccess = $false
-    try {
-        $webClient = New-Object System.Net.WebClient
-        $webClient.Headers.Add("User-Agent", "Mozilla/5.0")
-        $webClient.DownloadFile($zipUrl, $tempZip)
-        Expand-Archive -Path $tempZip -DestinationPath $installDir -Force
-        Remove-Item $tempZip -Force -ErrorAction SilentlyContinue
-        $downloadSuccess = $true
-        Write-Host "[SUCCESS] Extracted release package to $installDir" -ForegroundColor Green
-    } catch {
-        # Fallback to direct EXE download
+
+    foreach ($url in $urlsToTry) {
         try {
-            $webClient = New-Object System.Net.WebClient
-            $webClient.Headers.Add("User-Agent", "Mozilla/5.0")
-            $webClient.DownloadFile($exeFallbackUrl, $exePath)
-            $downloadSuccess = $true
-            Write-Host "[SUCCESS] Downloaded binary to $exePath" -ForegroundColor Green
+            Write-Host "  -> Fetching from: $url" -ForegroundColor DarkGray
+            if (Test-Path $tempZip) { Remove-Item $tempZip -Force -ErrorAction SilentlyContinue }
+            
+            $req = [System.Net.HttpWebRequest]::Create($url)
+            $req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            $req.AllowAutoRedirect = $true
+            $req.Timeout = 60000
+            $resp = $req.GetResponse()
+            
+            $fileStream = [System.IO.File]::Create($tempZip)
+            $respStream = $resp.GetResponseStream()
+            $respStream.CopyTo($fileStream)
+            $fileStream.Close()
+            $respStream.Close()
+            $resp.Close()
+
+            if ((Test-Path $tempZip) -and ((Get-Item $tempZip).Length -gt 1000000)) {
+                Expand-Archive -Path $tempZip -DestinationPath $installDir -Force
+                Remove-Item $tempZip -Force -ErrorAction SilentlyContinue
+                $downloadSuccess = $true
+                Write-Host "[SUCCESS] Package installed successfully to $installDir" -ForegroundColor Green
+                break
+            }
         } catch {
-            Write-Host "[ERROR] Download failed: $_" -ForegroundColor Red
-            return
+            Write-Host "     Retry fallback: $($_.Exception.Message)" -ForegroundColor DarkGray
         }
+    }
+
+    if (-not $downloadSuccess) {
+        $exeUrls = @(
+            "https://github.com/GunwantBhambra/XCODING/raw/main/bin/XCODING.exe",
+            "https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/bin/XCODING.exe"
+        )
+        foreach ($eUrl in $exeUrls) {
+            try {
+                $req = [System.Net.HttpWebRequest]::Create($eUrl)
+                $req.UserAgent = "Mozilla/5.0"
+                $req.AllowAutoRedirect = $true
+                $resp = $req.GetResponse()
+                $fileStream = [System.IO.File]::Create($exePath)
+                $resp.GetResponseStream().CopyTo($fileStream)
+                $fileStream.Close()
+                $resp.Close()
+
+                if ((Test-Path $exePath) -and ((Get-Item $exePath).Length -gt 200000)) {
+                    $downloadSuccess = $true
+                    Write-Host "[SUCCESS] Downloaded binary to $exePath" -ForegroundColor Green
+                    break
+                }
+            } catch {}
+        }
+    }
+
+    if (-not $downloadSuccess) {
+        Write-Host "[ERROR] Could not download package from any source. Please check your internet connection." -ForegroundColor Red
+        return
     }
 
     # Unblock all files in installation directory

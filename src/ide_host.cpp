@@ -238,6 +238,8 @@ void IdeHost::InitializeWebView(const std::wstring& htmlPath) {
 
                             // Map local editor directory to https://localhost (pre-authorized by Firebase default)
                             fs::path editorDir = fs::path(htmlPath).parent_path();
+                            fs::path htmlFilename = fs::path(htmlPath).filename();
+                            std::wstring navUrl = L"https://localhost/" + htmlFilename.wstring();
                             Microsoft::WRL::ComPtr<ICoreWebView2_3> webView3;
                             if (SUCCEEDED(m_webView.As(&webView3))) {
                                 webView3->SetVirtualHostNameToFolderMapping(
@@ -245,7 +247,7 @@ void IdeHost::InitializeWebView(const std::wstring& htmlPath) {
                                     editorDir.c_str(),
                                     COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_ALLOW
                                 );
-                                m_webView->Navigate(L"https://localhost/index.html");
+                                m_webView->Navigate(navUrl.c_str());
                             } else {
                                 std::wstring fileUri = L"file:///" + htmlPath;
                                 for (auto& c : fileUri) {

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XCODING - Teacher Edition & Live Student Inspector</title>
+
+  <!-- Google Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="teacher-portal-body">
+  <div id="app-root">
+
+    <!-- MAIN RIGHT CONTENT WORKSPACE -->
+    <div id="main-workspace-area" class="teacher-full-workspace">
+
+      <!-- TOP DRAGGABLE WINDOW BAR -->
+      <header id="window-drag-bar" class="teacher-topbar">
+        <div class="drag-left-group">
+          <div class="sidebar-brand" title="XCODING Teacher Portal">
+            <img src="icon.png" alt="XC" class="brand-logo-img">
+          </div>
+          <div class="teacher-brand-info">
+            <div class="teacher-title-badge">TEACHER EDITION</div>
+            <span class="teacher-sub-title">LIVE STUDENT INSPECTION &amp; AUTOMATED EVALUATION</span>
+          </div>
+        </div>
+
+        <!-- Center: Live Cloud Sync & Quick Summary -->
+        <div class="drag-center-group">
+          <div class="teacher-cloud-status" id="teacher-sync-status">
+            <span class="live-pulse-dot"></span>
+            <span>FIREBASE RTDB CONNECTED</span>
+          </div>
+        </div>
+
+        <!-- Right: Window Controls & Refresh -->
+        <div class="drag-right-group">
+          <button id="btn-teacher-refresh" class="btn-teacher-refresh-top" title="Reload Live Student Submissions">
+            <svg class="refresh-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>SYNC CLOUD</span>
+          </button>
+
+          <!-- Custom Window Controls -->
+          <div class="window-controls">
+            <button id="win-min" class="win-btn" title="Minimize">─</button>
+            <button id="win-max" class="win-btn" title="Maximize">▢</button>
+            <button id="win-close" class="win-btn close" title="Close">✕</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Top Progress Line -->
+      <div id="top-progress-line"></div>
+
+      <!-- TEACHER MAIN WORKSPACE CONTAINER (2 COLUMNS) -->
+      <div class="teacher-dashboard-layout">
+
+        <!-- ==============================================================
+             LEFT COLUMN: CLASS ROSTER & SEARCH
+             ============================================================== -->
+        <aside class="teacher-roster-sidebar">
+          
+          <!-- Class Overview Cyber Metrics -->
+          <div class="teacher-metrics-row">
+            <div class="teacher-metric-card">
+              <div class="tm-label">STUDENTS</div>
+              <div class="tm-val" id="tm-student-count">--</div>
+            </div>
+            <div class="teacher-metric-card">
+              <div class="tm-label">AVG CLEARED</div>
+              <div class="tm-val cyan" id="tm-avg-cleared">-- / 50</div>
+            </div>
+            <div class="teacher-metric-card">
+              <div class="tm-label">50/50 MASTERY</div>
+              <div class="tm-val gold" id="tm-completed-count">--</div>
+            </div>
+          </div>
+
+          <!-- Student Search & Filter Bar -->
+          <div class="teacher-search-box">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="teacher-student-search" placeholder="Search student name or email..." spellcheck="false" />
+          </div>
+
+          <!-- Quick Filter Segmented Pills -->
+          <div class="teacher-filter-pills" id="roster-filter-pills">
+            <button class="t-pill active" data-filter="all">ALL</button>
+            <button class="t-pill" data-filter="mastered">50/50</button>
+            <button class="t-pill" data-filter="active">ACTIVE TODAY</button>
+            <button class="t-pill" data-filter="needhelp">&lt; 10</button>
+          </div>
+
+          <!-- Student Cards List -->
+          <div class="teacher-student-list" id="teacher-student-list">
+            <!-- Dynamically populated student cards -->
+            <div class="roster-loading-state">Connecting to Firebase Realtime Database...</div>
+          </div>
+        </aside>
+
+        <!-- ==============================================================
+             RIGHT COLUMN: DEEP STUDENT WORK INSPECTOR
+             ============================================================== -->
+        <main class="teacher-inspector-main">
+
+          <!-- Selected Student Profile Header Banner -->
+          <div class="student-inspection-header" id="inspection-header">
+            <div class="student-identity-wrap">
+              <div class="student-avatar-large" id="insp-avatar">S</div>
+              <div class="student-meta">
+                <div class="student-headline-row">
+                  <h2 class="student-name-text" id="insp-name">Select a Student</h2>
+                  <span class="student-status-badge" id="insp-status-badge">ROSTER READY</span>
+                </div>
+                <div class="student-subline-row">
+                  <span class="student-email-tag" id="insp-email">Click any student from the left roster to view their live code</span>
+                  <span class="dot-sep">•</span>
+                  <span class="student-uid-tag" id="insp-uid">UID: --</span>
+                  <span class="dot-sep">•</span>
+                  <span class="student-synced-tag" id="insp-last-synced">Last Synced: --</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Student Progress Counter -->
+            <div class="student-progress-summary">
+              <div class="student-progress-numbers">
+                <span class="sp-big" id="insp-cleared-count">0</span>
+                <span class="sp-total">/ 50 CLEARED</span>
+              </div>
+              <div class="student-prog-bar-wrap">
+                <div class="student-prog-bar-fill" id="insp-progress-fill" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 50-LEVEL PROGRESSION MATRIX -->
+          <div class="levels-matrix-container">
+            <div class="levels-matrix-header">
+              <span class="matrix-title">50-CHALLENGE CODE INSPECTION MATRIX</span>
+              <div class="matrix-legend">
+                <span class="legend-item"><span class="legend-dot green"></span> Cleared (100%)</span>
+                <span class="legend-item"><span class="legend-dot yellow"></span> Attempted Code</span>
+                <span class="legend-item"><span class="legend-dot gray"></span> Unattempted</span>
+              </div>
+            </div>
+
+            <!-- 50 Level Chips Grid -->
+            <div class="levels-matrix-grid" id="levels-matrix-grid">
+              <!-- Dynamically populated 50 Level inspection buttons -->
+            </div>
+          </div>
+
+          <!-- CHALLENGE DETAILS & CODE EDITOR WORKSPACE -->
+          <div class="teacher-code-workspace">
+
+            <!-- Left Sub-panel: Monaco Code Editor with Student Code -->
+            <div class="teacher-editor-wrap">
+              <div class="editor-action-bar">
+                <div class="active-level-pill-badge" id="active-level-label">LEVEL 001: First Steps: Hello World</div>
+                <div class="editor-right-actions">
+                  <button id="btn-teacher-run" class="btn-google-run" title="Compile &amp; Test Student Code Locally">
+                    <svg class="play-icon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span>RUN STUDENT CODE</span>
+                  </button>
+                  <button id="btn-teacher-copy" class="btn-micro" title="Copy Student Code">COPY</button>
+                </div>
+              </div>
+
+              <!-- Monaco Code Editor Container -->
+              <div id="teacher-editor-container" class="teacher-editor-box"></div>
+            </div>
+
+            <!-- Right Sub-panel: Question Prompt + Live Console Diagnostics -->
+            <div class="teacher-side-console">
+              
+              <!-- Question Description Card -->
+              <div class="teacher-question-card">
+                <div class="tq-head" id="tq-title">Challenge Prompt</div>
+                <div class="tq-body" id="tq-desc">Select a challenge from the 50-level matrix above.</div>
+                <div class="tq-hint" id="tq-hint"></div>
+              </div>
+
+              <!-- Terminal Console Output -->
+              <div class="teacher-console-wrap">
+                <div class="console-header-bar">
+                  <span class="console-title">EVALUATION CONSOLE</span>
+                  <button id="btn-teacher-clear-console" class="btn-micro">CLEAR</button>
+                </div>
+                <div class="teacher-console-output" id="teacher-console-output">
+                  <div class="terminal-row info-msg">XCODING Teacher Evaluation Console ready.</div>
+                  <div class="terminal-row info-msg">Click "RUN STUDENT CODE" to verify student submissions against all automated test cases.</div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Monaco Editor Loader -->
+  <script src="vs/loader.js"></script>
+
+  <!-- Teacher Portal Logic -->
+  <script src="teacher.js"></script>
+</body>
+</html>

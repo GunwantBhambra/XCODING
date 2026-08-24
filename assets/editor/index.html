@@ -27,7 +27,7 @@
         <img src="icon.png" alt="XC" class="brand-logo-img">
       </div>
 
-      <!-- Main Navigation Tabs: STUDIO and LEVELS only -->
+      <!-- Main Navigation Tabs: STUDIO, LEVELS, and LEADERBOARD -->
       <nav class="sidebar-nav">
         <button id="tab-studio" class="nav-item active" title="Code Studio">
           <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -45,6 +45,17 @@
             <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
           </svg>
           <span class="nav-label">LEVELS</span>
+        </button>
+
+        <button id="tab-leaderboard" class="nav-item" title="Top 50 Global Leaderboard">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h10c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-2c-.55 0-1-.45-1-1v-2.34"></path>
+            <path d="M6 4h12v5a6 6 0 0 1-12 0V4z"></path>
+          </svg>
+          <span class="nav-label">RANKS</span>
         </button>
       </nav>
     </aside>
@@ -231,6 +242,94 @@
               <!-- Continuous Infinite Responsive Grid -->
               <div id="levels-infinite-grid" class="levels-infinite-grid">
                 <!-- Dynamically populated 50 Level Cards -->
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 3: LIVE TOP-50 GLOBAL LEADERBOARD
+             ================================================================== -->
+        <section id="view-leaderboard" class="app-page hidden">
+          <div class="leaderboard-scroll-container">
+            <div class="leaderboard-view-container">
+              
+              <!-- Header & Controls -->
+              <div class="leaderboard-header">
+                <div class="header-left-group">
+                  <div class="leaderboard-badge-tag">FIREBASE REALTIME CLUSTER</div>
+                  <h1 class="leaderboard-headline">GLOBAL LEADERBOARD</h1>
+                  <div class="leaderboard-subhead" id="leaderboard-summary-text">TOP 50 STUDENTS • LIVE PROGRESSION</div>
+                </div>
+
+                <div class="leaderboard-header-actions">
+                  <button id="btn-refresh-leaderboard" class="btn-leaderboard-refresh" title="Refresh Live Rankings">
+                    <svg class="refresh-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                    </svg>
+                    <span>REFRESH</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Top Metrics 4-Card Cyber Strip -->
+              <div class="leaderboard-stats-grid">
+                <div class="stat-card">
+                  <div class="stat-card-label">TOTAL STUDENTS</div>
+                  <div class="stat-card-val" id="lb-stat-students">--</div>
+                  <div class="stat-card-sub">Enrolled & Active</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-label">TOP SCORE</div>
+                  <div class="stat-card-val gold" id="lb-stat-topscore">-- / 50</div>
+                  <div class="stat-card-sub">Highest Cleared</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-label">AVG COMPLETION</div>
+                  <div class="stat-card-val cyan" id="lb-stat-avg">--%</div>
+                  <div class="stat-card-sub">Class Average</div>
+                </div>
+                <div class="stat-card highlight">
+                  <div class="stat-card-label">YOUR RANK</div>
+                  <div class="stat-card-val emerald" id="lb-stat-yourrank">#--</div>
+                  <div class="stat-card-sub" id="lb-stat-yourscore">0 / 50 Cleared</div>
+                </div>
+              </div>
+
+              <!-- Search Bar & Filters -->
+              <div class="leaderboard-controls-bar">
+                <div class="leaderboard-search-box">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="leaderboard-search-input" placeholder="Search top 50 students by name or email..." spellcheck="false" />
+                </div>
+                <div class="leaderboard-live-pill">
+                  <span class="live-pulse-dot"></span>
+                  <span>SYNCED WITH CLOUD</span>
+                </div>
+              </div>
+
+              <!-- Top 3 Podium Highlights -->
+              <div class="podium-container" id="leaderboard-podium">
+                <!-- Dynamically injected Rank 2 (Silver), Rank 1 (Gold), Rank 3 (Bronze) -->
+              </div>
+
+              <!-- Top 50 Ranked Table -->
+              <div class="leaderboard-table-card">
+                <div class="leaderboard-table-header">
+                  <div class="col-rank">RANK</div>
+                  <div class="col-user">STUDENT</div>
+                  <div class="col-progress">PROGRESSION</div>
+                  <div class="col-score">CLEARED</div>
+                  <div class="col-runs">RUNS / COMPILES</div>
+                  <div class="col-time">LAST ACTIVE</div>
+                </div>
+                <div class="leaderboard-table-body" id="leaderboard-table-rows">
+                  <!-- Dynamically populated top 50 student rows -->
+                </div>
               </div>
 
             </div>
