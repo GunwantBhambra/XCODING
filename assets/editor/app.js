@@ -20,10 +20,10 @@ const LEVELS = [
   {
     id: 1,
     title: "First Steps: Hello World",
-    topic: "Basics",
+    topic: "Strings",
     difficulty: "EASY",
     desc: "Print <code>Hello, World!</code> to standard output followed by a newline.",
-    hint: "Use cout << \"Hello, World!\" << endl; inside main().",
+    hint: "Textual messages in C++ must be enclosed within matching double quotes and piped to standard output.",
     examples: [
       { input: "(none)", output: "Hello, World!" }
     ],
@@ -42,22 +42,22 @@ int main() {
   },
   {
     id: 2,
-    title: "Custom Message",
-    topic: "Basics",
+    title: "Personalized Welcome",
+    topic: "Strings",
     difficulty: "EASY",
-    desc: "Print <code>Welcome to C++!</code> to standard output.",
-    hint: "Use cout << \"Welcome to C++!\" << endl;.",
+    desc: "Print <code>Welcome to C++ Programming!</code> to standard output.",
+    hint: "Ensure exact capitalization, spacing, and punctuation inside your string literal.",
     examples: [
-      { input: "(none)", output: "Welcome to C++!" }
+      { input: "(none)", output: "Welcome to C++ Programming!" }
     ],
     testCases: [
-      { input: "", expected: "Welcome to C++!" }
+      { input: "", expected: "Welcome to C++ Programming!" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    // Print "Welcome to C++!" to standard output
+    // Print "Welcome to C++ Programming!" to standard output
     
     return 0;
 }
@@ -66,21 +66,21 @@ int main() {
   {
     id: 3,
     title: "Two Lines of Text",
-    topic: "Basics",
+    topic: "Strings",
     difficulty: "EASY",
-    desc: "Print two lines of text:<br><code>Hello</code><br><code>World</code>",
-    hint: "Use two separate cout statements or \\n.",
+    desc: "Print two separate lines of text:<br><code>Coding is fun</code><br><code>Practice makes perfect</code>",
+    hint: "Think about how line breaks are introduced between text outputs.",
     examples: [
-      { input: "(none)", output: "Hello\\nWorld" }
+      { input: "(none)", output: "Coding is fun\nPractice makes perfect" }
     ],
     testCases: [
-      { input: "", expected: "Hello\nWorld" }
+      { input: "", expected: "Coding is fun\nPractice makes perfect" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    // Print "Hello" on line 1 and "World" on line 2
+    // Print the two required lines
     
     return 0;
 }
@@ -88,22 +88,22 @@ int main() {
   },
   {
     id: 4,
-    title: "Three-Line Introduction",
-    topic: "Basics",
+    title: "Tabular Alignment (Escape Sequences)",
+    topic: "Strings",
     difficulty: "EASY",
-    desc: "Print the following three lines:<br><code>I am learning C++</code><br><code>It is fast</code><br><code>It is fun</code>",
-    hint: "Use cout << \"...\" << endl; for each line.",
+    desc: "Print two columns separated by a tab character:<br><code>NAME\tSCORE</code><br><code>Alice\t100</code>",
+    hint: "Recall the special escape sequence used to insert horizontal tab spacing inside a string literal.",
     examples: [
-      { input: "(none)", output: "I am learning C++\\nIt is fast\\nIt is fun" }
+      { input: "(none)", output: "NAME\tSCORE\nAlice\t100" }
     ],
     testCases: [
-      { input: "", expected: "I am learning C++\nIt is fast\nIt is fun" }
+      { input: "", expected: "NAME\tSCORE\nAlice\t100" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    // Print the three required lines
+    // Print NAME and SCORE columns separated by tabs
     
     return 0;
 }
@@ -111,22 +111,22 @@ int main() {
   },
   {
     id: 5,
-    title: "3x3 Star Box",
-    topic: "Basics",
+    title: "Quoted Message (Escaped Quotes)",
+    topic: "Strings",
     difficulty: "EASY",
-    desc: "Print a 3x3 square of stars (*):<br><code>***</code><br><code>***</code><br><code>***</code>",
-    hint: "Print \"***\" three times, each on its own line.",
+    desc: "Print the exact text containing quotes:<br><code>She said, \"Keep learning!\"</code>",
+    hint: "When a quote character is part of the text rather than the code boundary, an escape backslash is required.",
     examples: [
-      { input: "(none)", output: "***\\n***\\n***" }
+      { input: "(none)", output: "She said, \"Keep learning!\"" }
     ],
     testCases: [
-      { input: "", expected: "***\n***\n***" }
+      { input: "", expected: "She said, \"Keep learning!\"" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    // Print 3 rows of 3 asterisks
+    // Print the quote including double quotes
     
     return 0;
 }
@@ -134,22 +134,22 @@ int main() {
   },
   {
     id: 6,
-    title: "Print Integer Literal",
-    topic: "Variables",
+    title: "Display File Path (Escaped Backslashes)",
+    topic: "Strings",
     difficulty: "EASY",
-    desc: "Print the number <code>42</code> directly to standard output.",
-    hint: "Use cout << 42 << endl; without quotes.",
+    desc: "Print a file directory path with backslashes:<br><code>C:\\Users\\Student\\Project</code>",
+    hint: "The backslash character itself initiates an escape sequence; consider how to represent a literal backslash.",
     examples: [
-      { input: "(none)", output: "42" }
+      { input: "(none)", output: "C:\\Users\\Student\\Project" }
     ],
     testCases: [
-      { input: "", expected: "42" }
+      { input: "", expected: "C:\\Users\\Student\\Project" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    // Print the number 42
+    // Print the Windows file path with backslashes
     
     return 0;
 }
@@ -157,22 +157,23 @@ int main() {
   },
   {
     id: 7,
-    title: "Three Numbers with Spaces",
-    topic: "Variables",
+    title: "String Variable Display",
+    topic: "Strings",
     difficulty: "EASY",
-    desc: "Print the numbers <code>10 20 30</code> separated by single spaces on one line.",
-    hint: "Use cout << 10 << \" \" << 20 << \" \" << 30 << endl;.",
+    desc: "Declare a <code>string</code> variable named <code>lang</code> initialized to <code>\"C++\"</code>, and output: <code>I love C++</code>",
+    hint: "Include the standard string header if needed and combine variables with literal text during stream insertion.",
     examples: [
-      { input: "(none)", output: "10 20 30" }
+      { input: "(none)", output: "I love C++" }
     ],
     testCases: [
-      { input: "", expected: "10 20 30" }
+      { input: "", expected: "I love C++" }
     ],
     starterCode: `#include <iostream>
+#include <string>
 using namespace std;
 
 int main() {
-    // Print 10 20 30 on a single line separated by spaces
+    // Declare string lang = "C++" and print "I love " followed by lang
     
     return 0;
 }
@@ -180,22 +181,26 @@ int main() {
   },
   {
     id: 8,
-    title: "Integer Variable",
-    topic: "Variables",
+    title: "Read a Single Word",
+    topic: "Strings",
     difficulty: "EASY",
-    desc: "Declare an integer variable <code>x = 100;</code> and print its value.",
-    hint: "Use int x = 100; cout << x << endl;.",
+    desc: "Read a single word (a student's first name) from standard input and print: <code>Hello, [name]!</code>",
+    hint: "Standard stream extraction reads individual whitespace-delimited tokens into a string variable.",
     examples: [
-      { input: "(none)", output: "100" }
+      { input: "Alex", output: "Hello, Alex!" },
+      { input: "Sarah", output: "Hello, Sarah!" }
     ],
     testCases: [
-      { input: "", expected: "100" }
+      { input: "Alex", expected: "Hello, Alex!" },
+      { input: "Jordan", expected: "Hello, Jordan!" },
+      { input: "Taylor", expected: "Hello, Taylor!" }
     ],
     starterCode: `#include <iostream>
+#include <string>
 using namespace std;
 
 int main() {
-    // Declare integer x = 100 and print it
+    // Read a name from standard input and print "Hello, <name>!"
     
     return 0;
 }
@@ -203,22 +208,26 @@ int main() {
   },
   {
     id: 9,
-    title: "Variable with Text Label",
-    topic: "Variables",
+    title: "Format Two Words (Last, First)",
+    topic: "Strings",
     difficulty: "EASY",
-    desc: "Declare an integer <code>score = 95;</code> and print <code>Score: 95</code>.",
-    hint: "Use cout << \"Score: \" << score << endl;.",
+    desc: "Read two words from input representing a first name and a last name (e.g., <code>John Doe</code>). Output formatted as: <code>User: Doe, John</code>",
+    hint: "Extract multiple string variables sequentially and reorder them appropriately when printing.",
     examples: [
-      { input: "(none)", output: "Score: 95" }
+      { input: "John Doe", output: "User: Doe, John" },
+      { input: "Ada Lovelace", output: "User: Lovelace, Ada" }
     ],
     testCases: [
-      { input: "", expected: "Score: 95" }
+      { input: "John Doe", expected: "User: Doe, John" },
+      { input: "Alan Turing", expected: "User: Turing, Alan" },
+      { input: "Grace Hopper", expected: "User: Hopper, Grace" }
     ],
     starterCode: `#include <iostream>
+#include <string>
 using namespace std;
 
 int main() {
-    // Declare score = 95 and print "Score: 95"
+    // Read first and last name, print "User: <last>, <first>"
     
     return 0;
 }
@@ -226,22 +235,25 @@ int main() {
   },
   {
     id: 10,
-    title: "Reassigning a Variable",
-    topic: "Variables",
+    title: "Read Full Line With Spaces",
+    topic: "Strings",
     difficulty: "EASY",
-    desc: "Declare <code>int val = 50;</code>, reassign it to <code>99</code>, and print <code>val</code>.",
-    hint: "Assign val = 99 before printing.",
+    desc: "Read an entire line of text (which may contain spaces) from input and print: <code>Echo: [line]</code>",
+    hint: "Standard extraction stops at whitespace; investigate standard library functions designed to read whole lines into a string.",
     examples: [
-      { input: "(none)", output: "99" }
+      { input: "Never give up on your dreams", output: "Echo: Never give up on your dreams" }
     ],
     testCases: [
-      { input: "", expected: "99" }
+      { input: "Never give up on your dreams", expected: "Echo: Never give up on your dreams" },
+      { input: "Learning C++ step by step", expected: "Echo: Learning C++ step by step" },
+      { input: "Clean code always wins", expected: "Echo: Clean code always wins" }
     ],
     starterCode: `#include <iostream>
+#include <string>
 using namespace std;
 
 int main() {
-    // Declare val = 50, update val = 99, and print val
+    // Read an entire line of text with spaces and echo it
     
     return 0;
 }
