@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XCODING</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="icon.png">
+  
+  <!-- Modern Clean Google Sans / Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Firebase SDKs for Google Sign-In & Auth -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="vs/loader.js"></script>
+</head>
+<body>
+  <div id="app">
+    
+    <!-- LEFT ACTIVITY / NAVIGATION BAR -->
+    <aside id="left-activity-bar">
+      <!-- Brand Logo -->
+      <div class="sidebar-brand" title="XCODING">
+        <img src="icon.png" alt="XC" class="brand-logo-img">
+      </div>
+
+      <!-- Main Navigation Tabs: STUDIO, LEVELS, and LEADERBOARD -->
+      <nav class="sidebar-nav">
+        <button id="tab-studio" class="nav-item active" title="Code Studio">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+          <span class="nav-label">STUDIO</span>
+        </button>
+
+        <button id="tab-levels" class="nav-item" title="Level Map Explorer">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+          </svg>
+          <span class="nav-label">LEVELS</span>
+        </button>
+
+        <button id="tab-leaderboard" class="nav-item" title="Top 50 Global Leaderboard">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h10c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-2c-.55 0-1-.45-1-1v-2.34"></path>
+            <path d="M6 4h12v5a6 6 0 0 1-12 0V4z"></path>
+          </svg>
+          <span class="nav-label">RANKS</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- MAIN RIGHT CONTENT WORKSPACE -->
+    <div id="main-workspace-area">
+
+      <!-- TOP DRAGGABLE WINDOW BAR -->
+      <header id="window-drag-bar">
+        <!-- Left: Active File & Fast-Access RUN Button (Right within reach!) -->
+        <div class="drag-left-meta">
+          <span class="active-file-indicator" id="file-title">main.cpp</span>
+
+          <!-- Studio Fast-Access Actions (Visible in Studio) -->
+          <div class="header-studio-actions" id="header-studio-actions">
+            <button id="btn-run" class="btn-google-run" title="Compile & Run Automated Tests (F5)">
+              <svg class="icon-svg" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <span>RUN</span>
+            </button>
+            <button id="btn-stop" class="btn-micro" title="Stop (Shift+F5)" disabled>STOP</button>
+            <button id="btn-save" class="btn-micro" title="Save (Ctrl+S)">SAVE</button>
+            <button id="btn-clear" class="btn-micro" title="Clear Console (Ctrl+K)">CLEAR</button>
+          </div>
+        </div>
+
+        <!-- DEAD CENTER: LEVEL BADGE WITH TRAIN DROPDOWN -->
+        <div class="drag-center-container">
+          <button class="dead-center-level-badge" id="btn-level-train-trigger" title="Click to open Level Train Stepper">
+            <span class="center-badge-prefix">LV</span>
+            <span class="center-badge-number" id="header-level-tag">001</span>
+            <span class="center-badge-hint">▾</span>
+          </button>
+
+          <!-- FLOATING DROPDOWN LEVEL TRAIN PANEL -->
+          <div id="level-train-dropdown" class="level-train-dropdown hidden">
+            <div class="train-dropdown-header">
+              <span class="train-dropdown-title">LEVEL TRAIN SELECTOR</span>
+              <button id="btn-train-view-grid" class="train-grid-btn" title="View 50 Catalog Grid">CATALOG ⊞</button>
+            </div>
+            <div class="level-train-container" id="level-train-container">
+              <div class="level-train-track" id="level-train-track">
+                <!-- Dynamically rendered 50 level nodes on the track -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Tally, User Account & Window Controls -->
+        <div class="drag-right-group">
+          <!-- Tally Counter -->
+          <div class="top-right-user-area">
+            <div class="header-tally" title="Live Cumulative Tally">
+              <span>C: <strong id="tally-compiles">0</strong></span>
+              <span class="tally-sep">|</span>
+              <span>R: <strong id="tally-runs">0</strong></span>
+            </div>
+
+            <!-- Account Dropdown Trigger -->
+            <div class="user-dropdown-container">
+              <button id="user-profile-btn" class="user-dropdown-btn" title="Account Menu">
+                <span class="user-avatar-circle" id="user-avatar-text">U</span>
+                <span class="user-name-text" id="user-display-name">STUDENT</span>
+                <span class="dropdown-caret">▾</span>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div id="user-dropdown-menu" class="user-dropdown-menu hidden">
+                <!-- User Profile Header -->
+                <div class="dropdown-user-header">
+                  <div class="dropdown-avatar-wrap">
+                    <span class="dropdown-avatar-circle" id="dropdown-avatar-text">G</span>
+                    <span class="status-indicator-dot" title="Cloud Sync Active"></span>
+                  </div>
+                  <div class="dropdown-user-details">
+                    <div class="dropdown-user-name" id="dropdown-user-name">Student Account</div>
+                    <div class="dropdown-user-email" id="dropdown-user-email">Offline Guest</div>
+                  </div>
+                </div>
+
+                <!-- 2x2 Cyber Metrics Cards -->
+                <div class="dropdown-stats-grid">
+                  <div class="stat-mini-card">
+                    <div class="stat-mini-label">COMPILES</div>
+                    <div class="stat-mini-val" id="dropdown-compiles">0</div>
+                  </div>
+                  <div class="stat-mini-card">
+                    <div class="stat-mini-label">RUNS</div>
+                    <div class="stat-mini-val" id="dropdown-runs">0</div>
+                  </div>
+                  <div class="stat-mini-card">
+                    <div class="stat-mini-label">CLEARED</div>
+                    <div class="stat-mini-val emerald" id="dropdown-cleared">0 / 50</div>
+                  </div>
+                  <div class="stat-mini-card">
+                    <div class="stat-mini-label">STATUS</div>
+                    <div class="stat-mini-val cyan" id="dropdown-status">ONLINE</div>
+                  </div>
+                </div>
+
+                <!-- Menu Actions -->
+                <div class="dropdown-actions-group">
+                  <button id="btn-check-updates" class="dropdown-action-item" title="Check for application updates">
+                    <div class="action-item-left">
+                      <svg class="action-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                      </svg>
+                      <span>Check for Updates</span>
+                    </div>
+                    <span class="app-version-badge" id="dropdown-version-tag">v1.0.1</span>
+                  </button>
+
+                  <button id="btn-force-update" class="dropdown-action-item force-update-action" title="1-Click Force Reinstall from Cloud (Downloads & updates all binaries/assets)">
+                    <div class="action-item-left">
+                      <svg class="action-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #ffb86c;">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                      </svg>
+                      <span style="font-weight: 600; color: #ffb86c;">⚡ Force Update / Reinstall</span>
+                    </div>
+                    <span class="app-version-badge warning">1-CLICK</span>
+                  </button>
+
+                  <button id="btn-logout" class="dropdown-logout-action" title="Sign out of student account">
+                    <svg class="logout-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                    </svg>
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Window Controls -->
+          <div class="window-controls">
+            <button id="win-min" class="win-btn" title="Minimize">─</button>
+            <button id="win-max" class="win-btn" title="Maximize">▢</button>
+            <button id="win-close" class="win-btn close" title="Close">✕</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Top Progress Line with Google AI Gradient -->
+      <div id="top-progress-line"></div>
+
+      <!-- DEDICATED VIEW PAGES (STUDIO & LEVELS) -->
+      <div id="app-view-container">
+
+        <!-- ==================================================================
+             PAGE 1: GOOGLE AI LEVEL EXPLORER (50 LEVELS)
+             ================================================================== -->
+        <section id="view-levels" class="app-page hidden">
+          <div class="levels-scroll-container">
+            <div class="levels-view-container">
+              
+              <!-- Header & Controls -->
+              <div class="levels-google-header">
+                <div class="header-left-group">
+                  <h1 class="levels-headline">LEVELS</h1>
+                  <div class="levels-subhead" id="levels-summary-text">50 CHALLENGES • 0 CLEARED</div>
+                </div>
+
+                <!-- Segmented Filter Control -->
+                <div class="google-segmented-filter" id="level-filter-group">
+                  <button class="seg-btn active" data-filter="all">ALL</button>
+                  <button class="seg-btn" data-filter="cleared">CLEARED</button>
+                  <button class="seg-btn" data-filter="unlocked">UNLOCKED</button>
+                  <button class="seg-btn" data-filter="locked">LOCKED</button>
+                </div>
+              </div>
+
+              <!-- Search Bar & Topic Chips -->
+              <div class="levels-controls-bar">
+                <div class="levels-search-box">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="level-search-input" placeholder="Search 50 challenges..." spellcheck="false" />
+                </div>
+
+                <div class="topic-chips-container" id="topic-chips-bar">
+                  <button class="topic-chip active" data-topic="all">All Topics</button>
+                  <button class="topic-chip" data-topic="Basics">Basics</button>
+                  <button class="topic-chip" data-topic="Variables">Variables</button>
+                  <button class="topic-chip" data-topic="Input">Input</button>
+                  <button class="topic-chip" data-topic="Arithmetic">Arithmetic</button>
+                  <button class="topic-chip" data-topic="Expressions">Expressions</button>
+                  <button class="topic-chip" data-topic="Floating Point">Floating Point</button>
+                </div>
+              </div>
+
+              <!-- Continuous Infinite Responsive Grid -->
+              <div id="levels-infinite-grid" class="levels-infinite-grid">
+                <!-- Dynamically populated 50 Level Cards -->
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 3: LIVE TOP-50 GLOBAL LEADERBOARD
+             ================================================================== -->
+        <section id="view-leaderboard" class="app-page hidden">
+          <div class="leaderboard-scroll-container">
+            <div class="leaderboard-view-container">
+              
+              <!-- Header & Controls -->
+              <div class="leaderboard-header">
+                <div class="header-left-group">
+                  <div class="leaderboard-badge-tag">FIREBASE REALTIME CLUSTER</div>
+                  <h1 class="leaderboard-headline">GLOBAL LEADERBOARD</h1>
+                  <div class="leaderboard-subhead" id="leaderboard-summary-text">TOP 50 STUDENTS • LIVE PROGRESSION</div>
+                </div>
+
+                <div class="leaderboard-header-actions">
+                  <button id="btn-refresh-leaderboard" class="btn-leaderboard-refresh" title="Refresh Live Rankings">
+                    <svg class="refresh-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                    </svg>
+                    <span>REFRESH</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Top Metrics 4-Card Cyber Strip -->
+              <div class="leaderboard-stats-grid">
+                <div class="stat-card">
+                  <div class="stat-card-label">TOTAL STUDENTS</div>
+                  <div class="stat-card-val" id="lb-stat-students">--</div>
+                  <div class="stat-card-sub">Enrolled & Active</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-label">TOP SCORE</div>
+                  <div class="stat-card-val gold" id="lb-stat-topscore">-- / 50</div>
+                  <div class="stat-card-sub">Highest Cleared</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-label">AVG COMPLETION</div>
+                  <div class="stat-card-val cyan" id="lb-stat-avg">--%</div>
+                  <div class="stat-card-sub">Class Average</div>
+                </div>
+                <div class="stat-card highlight">
+                  <div class="stat-card-label">YOUR RANK</div>
+                  <div class="stat-card-val emerald" id="lb-stat-yourrank">#--</div>
+                  <div class="stat-card-sub" id="lb-stat-yourscore">0 / 50 Cleared</div>
+                </div>
+              </div>
+
+              <!-- Search Bar & Filters -->
+              <div class="leaderboard-controls-bar">
+                <div class="leaderboard-search-box">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="leaderboard-search-input" placeholder="Search top 50 students by name or email..." spellcheck="false" />
+                </div>
+                <div class="leaderboard-live-pill">
+                  <span class="live-pulse-dot"></span>
+                  <span>SYNCED WITH CLOUD</span>
+                </div>
+              </div>
+
+              <!-- Top 3 Podium Highlights -->
+              <div class="podium-container" id="leaderboard-podium">
+                <!-- Dynamically injected Rank 2 (Silver), Rank 1 (Gold), Rank 3 (Bronze) -->
+              </div>
+
+              <!-- Top 50 Ranked Table -->
+              <div class="leaderboard-table-card">
+                <div class="leaderboard-table-header">
+                  <div class="col-rank">RANK</div>
+                  <div class="col-user">STUDENT</div>
+                  <div class="col-progress">PROGRESSION</div>
+                  <div class="col-score">CLEARED</div>
+                  <div class="col-runs">RUNS / COMPILES</div>
+                  <div class="col-time">LAST ACTIVE</div>
+                </div>
+                <div class="leaderboard-table-body" id="leaderboard-table-rows">
+                  <!-- Dynamically populated top 50 student rows -->
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             PAGE 2: 2-COLUMN FULL-WIDTH CODE STUDIO WORKSPACE
+             ================================================================== -->
+        <section id="view-studio" class="app-page active">
+          <div id="studio-container">
+            <!-- Left: Monaco Code Editor -->
+            <main id="editor-container"></main>
+
+            <!-- Center Splitter Slider -->
+            <div id="splitter" title="Drag to resize"></div>
+
+            <!-- Right Column: Permanent Challenge Question (Top) + Terminal Console (Bottom) -->
+            <section id="right-studio-column">
+              
+              <!-- Top Half: Permanent Question Panel -->
+              <div id="challenge-question-panel">
+                <div class="question-header-bar">
+                  <div class="question-badge-row">
+                    <span class="q-pill-level" id="studio-level-tag">LEVEL 001</span>
+                    <span class="q-pill-topic" id="studio-topic-tag">BASICS</span>
+                    <span class="q-pill-diff" id="studio-diff-tag">EASY</span>
+                  </div>
+                  <button id="btn-quick-switch-levels" class="btn-micro" title="Switch Level (View All Challenges)">LEVELS ▾</button>
+                </div>
+
+                <h2 class="question-title" id="studio-title">First Steps: Hello C++</h2>
+                <div class="question-desc" id="studio-desc">Print <code>Hello, World!</code> to standard output.</div>
+
+                <!-- Examples Box -->
+                <div class="question-examples-box">
+                  <div class="q-examples-header">EXAMPLES</div>
+                  <div class="q-examples-list" id="studio-examples-container">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+
+                <div class="question-hint-box" id="studio-hint">
+                  💡 Hint: Use cout &lt;&lt; "Hello, World!" &lt;&lt; endl; in main().
+                </div>
+              </div>
+
+              <!-- Horizontal Divider -->
+              <div id="right-column-divider"></div>
+
+              <!-- Bottom Half: Direct Terminal Console -->
+              <div id="console-container">
+                <div id="console-header-bar">
+                  <span class="console-title">TERMINAL CONSOLE</span>
+                  <button id="btn-console-clear-quick" class="btn-micro" title="Clear Console (Ctrl+K)">CLEAR</button>
+                </div>
+                <div id="console-output">
+                  <div id="active-prompt-row">
+                    <span class="cmd-prompt">C:\XCODING&gt;</span>
+                    <input type="text" id="terminal-inline-input" autocomplete="off" spellcheck="false" autofocus />
+                  </div>
+                </div>
+              </div>
+
+            </section>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- CELEBRATION MODAL (Shows after 5 seconds of log viewing, Top Cross Close & Jet Black Next Level Button) -->
+    <div id="level-passed-overlay" class="modal-overlay hidden">
+      <div class="passed-google-card">
+        <button id="btn-close-passed-modal" class="btn-passed-close" title="Close (View Logs)">✕</button>
+        <div class="passed-glow-circle">✓</div>
+        <h2 class="passed-google-title" id="passed-level-title">LEVEL 001 CLEARED</h2>
+        <p class="passed-google-desc" id="passed-level-desc">All automated test cases passed with 100% precision. Next challenge unlocked.</p>
+        <div class="passed-google-btn-row">
+          <button id="btn-next-level" class="btn-jet-black-next full">NEXT LEVEL ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pure Google Authentication Modal -->
+    <div id="auth-modal-overlay" class="modal-overlay hidden">
+      <div class="auth-modal-box">
+        <div class="auth-header">
+          <div class="brand-logo modal-brand">XCODING</div>
+          <p class="auth-caption">Sign in with Google to sync your student profile and progress</p>
+        </div>
+
+        <div id="auth-error-msg" class="auth-error-msg hidden"></div>
+
+        <!-- Google Sign In Button -->
+        <button type="button" id="btn-google-login" class="btn-auth-google">
+          <svg class="google-svg" viewBox="0 0 48 48" width="20" height="20">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          CONTINUE WITH GOOGLE
+        </button>
+
+        <div class="auth-sep-line">
+          <span>or</span>
+        </div>
+
+        <button type="button" id="btn-guest-login" class="btn-auth-secondary">
+          CONTINUE AS OFFLINE GUEST
+        </button>
+
+        <div class="auth-footer-text">
+          Session persisted in <code>%LOCALAPPDATA%\XCODING</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTO UPDATE MODAL -->
+    <div id="update-modal-overlay" class="modal-overlay hidden">
+      <div class="update-modal-card">
+        <button id="btn-close-update-modal" class="btn-passed-close" title="Close">✕</button>
+        <div class="update-icon-circle">⚡</div>
+        <h2 class="update-card-title" id="update-modal-title">UPDATE AVAILABLE</h2>
+        <div class="update-version-row">
+          <span class="curr-ver" id="update-curr-ver">v1.0.0</span>
+          <span class="ver-arrow">→</span>
+          <span class="new-ver" id="update-new-ver">v1.1.0</span>
+        </div>
+        <p class="update-card-desc" id="update-modal-desc">A new version of XCODING is available with performance improvements and new challenges.</p>
+        <div id="update-progress-container" class="update-progress-container hidden">
+          <div class="update-progress-bar-bg">
+            <div class="update-progress-bar-fill" id="update-progress-fill"></div>
+          </div>
+          <span class="update-progress-label" id="update-progress-label">Downloading update...</span>
+        </div>
+        <div class="update-btn-row" id="update-action-buttons">
+          <button id="btn-perform-update" class="btn-jet-black-next full">UPDATE NOW ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -570,34 +570,58 @@ void IdeHost::HandlePerformUpdate(const std::string& downloadUrl) {
 
 void IdeHost::HandleForceUpdate() {
     std::thread([this]() {
-        PostJsonToWeb("{\"type\":\"force_update_start\",\"message\":\"Launching 1-click cloud installer...\"}");
+        PostJsonToWeb("{\"type\":\"force_update_start\",\"message\":\"Launching cloud updater...\"}");
 
-        // Write helper update batch file to %TEMP%\xcoding_updater.bat
         wchar_t tempPath[MAX_PATH];
         GetTempPathW(MAX_PATH, tempPath);
-        fs::path batPath = fs::path(tempPath) / "xcoding_updater.bat";
+        fs::path batPath = fs::path(tempPath) / "xcoding_cloud_update.bat";
 
         std::ofstream ofs(batPath);
         if (ofs.is_open()) {
             ofs << "@echo off\n";
-            ofs << "title XCODING 1-Click Cloud Updater\n";
+            ofs << "title XCODING Cloud Updater\n";
+            ofs << "cls\n";
             ofs << "echo =========================================================\n";
-            ofs << "echo  Starting XCODING 1-Click Cloud Reinstall / Update\n";
+            ofs << "echo   XCODING - Native Cloud Updater & Reinstaller\n";
             ofs << "echo =========================================================\n";
+            ofs << "echo.\n";
+            ofs << "set \"INSTALL_DIR=%LOCALAPPDATA%\\Programs\\XCODING\"\n";
+            ofs << "set \"TEMP_ZIP=%TEMP%\\xcoding_release.zip\"\n";
+            ofs << "set \"EXE_PATH=%LOCALAPPDATA%\\Programs\\XCODING\\XCODING.exe\"\n";
+            ofs << "echo [1/3] Closing running instances of XCODING...\n";
             ofs << "taskkill /F /IM XCODING.exe /T >nul 2>&1\n";
             ofs << "taskkill /F /IM XCODING_TEACHER.exe /T >nul 2>&1\n";
             ofs << "taskkill /F /IM CodeFork.exe /T >nul 2>&1\n";
-            ofs << "timeout /t 2 /nobreak >nul\n";
-            ofs << "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/install.ps1 | iex\"\n";
-            ofs << "if errorlevel 1 (\n";
-            ofs << "    echo.\n";
-            ofs << "    echo [ERROR] Update encountered an issue. Press any key to exit.\n";
-            ofs << "    pause >nul\n";
+            ofs << "timeout /t 1 /nobreak >nul\n";
+            ofs << "if not exist \"%INSTALL_DIR%\" mkdir \"%INSTALL_DIR%\"\n";
+            ofs << "echo [2/3] Fetching latest release package from GitHub...\n";
+            ofs << "curl.exe -f -L -s -S --retry 3 -o \"%TEMP_ZIP%\" \"https://github.com/GunwantBhambra/XCODING/raw/main/XCODING_windows_x64.zip\"\n";
+            ofs << "if not exist \"%TEMP_ZIP%\" (\n";
+            ofs << "    echo   Retrying with mirror...\n";
+            ofs << "    curl.exe -f -L -s -S --retry 3 -o \"%TEMP_ZIP%\" \"https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/bin/XCODING_windows_x64.zip\"\n";
             ofs << ")\n";
+            ofs << "if not exist \"%TEMP_ZIP%\" (\n";
+            ofs << "    echo [ERROR] Could not download update package. Please check your internet connection.\n";
+            ofs << "    echo.\n";
+            ofs << "    pause\n";
+            ofs << "    exit /b 1\n";
+            ofs << ")\n";
+            ofs << "echo [3/3] Extracting and updating files...\n";
+            ofs << "tar.exe -xf \"%TEMP_ZIP%\" -C \"%INSTALL_DIR%\"\n";
+            ofs << "del \"%TEMP_ZIP%\" >nul 2>&1\n";
+            ofs << "echo.\n";
+            ofs << "echo =========================================================\n";
+            ofs << "echo  [SUCCESS] XCODING has been updated successfully!\n";
+            ofs << "echo =========================================================\n";
+            ofs << "echo.\n";
+            ofs << "echo Launching XCODING...\n";
+            ofs << "start \"\" \"%EXE_PATH%\"\n";
+            ofs << "timeout /t 2 >nul\n";
+            ofs << "exit\n";
             ofs.close();
         }
 
-        // Launch the batch updater using ShellExecuteW
+        // Launch the native batch updater
         HINSTANCE hInst = ShellExecuteW(
             NULL,
             L"open",
@@ -608,25 +632,10 @@ void IdeHost::HandleForceUpdate() {
         );
 
         if ((INT_PTR)hInst > 32) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
             ExitProcess(0);
         } else {
-            // Fallback: try direct powershell ShellExecute
-            HINSTANCE hPs = ShellExecuteW(
-                NULL,
-                L"open",
-                L"powershell.exe",
-                L"-NoProfile -ExecutionPolicy Bypass -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://raw.githubusercontent.com/GunwantBhambra/XCODING/main/install.ps1 | iex\"",
-                NULL,
-                SW_SHOW
-            );
-
-            if ((INT_PTR)hPs > 32) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(300));
-                ExitProcess(0);
-            } else {
-                PostJsonToWeb("{\"type\":\"force_update_error\",\"message\":\"Failed to launch updater process.\"}");
-            }
+            PostJsonToWeb("{\"type\":\"force_update_error\",\"message\":\"Failed to launch updater process.\"}");
         }
     }).detach();
 }
