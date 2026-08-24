@@ -73,14 +73,20 @@
                 $winStateBackup = $null
                 if (Test-Path "$installDir\.window_state") { $winStateBackup = Get-Content "$installDir\.window_state" -Raw }
 
-                # 2. Terminate all lingering processes forcefully and wait
-                Get-Process -Name "XCODING", "XCODING_TEACHER", "CodeFork", "msedgewebview2" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-                Start-Sleep -Milliseconds 800
+                # 2. Terminate all lingering processes forcefully with retry
+                for ($p = 0; $p -lt 3; $p++) {
+                    Get-Process -Name "XCODING", "XCODING_TEACHER", "CodeFork", "msedgewebview2" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+                    Start-Sleep -Milliseconds 300
+                }
 
-                # 3. DELETE AND REMAKE INSTALL DIRECTORY
+                # 3. 100% COMPLETE WIPE WITH RETRY
                 if (Test-Path $installDir) {
-                    Remove-Item -Path $installDir -Recurse -Force -ErrorAction SilentlyContinue
-                    Start-Sleep -Milliseconds 200
+                    for ($w = 0; $w -lt 5; $w++) {
+                        Get-ChildItem -Path $installDir -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+                        Remove-Item -Path $installDir -Recurse -Force -ErrorAction SilentlyContinue
+                        if (-not (Test-Path $installDir)) { break }
+                        Start-Sleep -Milliseconds 300
+                    }
                 }
                 New-Item -ItemType Directory -Path $installDir -Force | Out-Null
 
