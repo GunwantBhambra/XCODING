@@ -16,45 +16,53 @@ Write-Host ""
 
 $installDir = "$env:LOCALAPPDATA\Programs\XCODING"
 $exePath = "$installDir\XCODING.exe"
-$downloadUrl = "https://github.com/GunwantBhambra/XCODING/releases/download/v1.0.0/XCODING.exe"
 
 # Create installation directory
 if (-not (Test-Path $installDir)) {
     New-Item -ItemType Directory -Path $installDir -Force | Out-Null
 }
 
-Write-Host "[1/4] Downloading latest XCODING binary..." -ForegroundColor Yellow
+Write-Host "[1/4] Finding latest release..." -ForegroundColor Yellow
+$downloadUrl = $null
 try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/GunwantBhambra/XCODING/releases" -Headers @{"User-Agent"="XCODING-Installer"}
+    if ($releases.Count -gt 0) {
+        $latest = $releases[0]
+        foreach ($asset in $latest.assets) {
+            if ($asset.name.EndsWith(".exe")) {
+                $downloadUrl = $asset.browser_download_url
+                break
+            }
+        }
+    }
+} catch {}
+
+if (-not $downloadUrl) {
+    $downloadUrl = "https://github.com/GunwantBhambra/XCODING/releases/download/v1.0.0/XCODING_1.0.1.exe"
+}
+
+Write-Host "[2/4] Downloading XCODING executable from GitHub..." -ForegroundColor Yellow
+try {
     $webClient = New-Object System.Net.WebClient
-    $webClient.Headers.Add("User-Agent", "XCODING-Installer/1.0")
+    $webClient.Headers.Add("User-Agent", "Mozilla/5.0")
     $webClient.DownloadFile($downloadUrl, $exePath)
 
-    # Validate file is a real binary and not a 404 HTML page
     $fileSize = (Get-Item $exePath).Length
     if ($fileSize -lt 100000) {
         Remove-Item $exePath -Force -ErrorAction SilentlyContinue
-        Write-Host ""
-        Write-Host "[!] Download received invalid package ($fileSize bytes)." -ForegroundColor Red
-        Write-Host "    Reason: The GitHub repository 'GunwantBhambra/XCODING' is currently set to PRIVATE." -ForegroundColor Yellow
-        Write-Host "    Solution: Go to https://github.com/GunwantBhambra/XCODING/settings and set visibility to PUBLIC." -ForegroundColor Cyan
-        Write-Host ""
-        Read-Host "Press Enter to exit..."
+        Write-Host "[ERROR] Downloaded file is too small ($fileSize bytes)." -ForegroundColor Red
         return
     }
 
     Write-Host "[SUCCESS] Downloaded to $exePath ($( [math]::Round($fileSize/1MB, 2) ) MB)" -ForegroundColor Green
 } catch {
-    Write-Host ""
     Write-Host "[ERROR] Download failed: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "Note: If your repository is Private, set it to Public on GitHub to allow 1-click CLI installs." -ForegroundColor Yellow
-    Write-Host ""
-    Read-Host "Press Enter to exit..."
     return
 }
 
 # Add to User PATH
-Write-Host "[2/4] Configuring environment PATH..." -ForegroundColor Yellow
+Write-Host "[3/4] Configuring environment PATH & Shortcuts..." -ForegroundColor Yellow
 try {
     $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
     if ($userPath -notlike "*$installDir*") {
@@ -69,7 +77,6 @@ try {
 }
 
 # Create Desktop Shortcut
-Write-Host "[3/4] Creating Desktop shortcut..." -ForegroundColor Yellow
 try {
     $wshShell = New-Object -ComObject WScript.Shell
     $desktopPath = [Environment]::GetFolderPath("Desktop")
