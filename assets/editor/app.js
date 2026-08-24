@@ -13,16 +13,17 @@ const FIREBASE_CONFIG = {
 };
 
 // ==========================================================================
-// Level Generator & Question Catalog (100+ Algorithmic Challenges with Real Test Cases)
+// Level Catalog (50 Progressive Algorithmic & Math Challenges)
+// Progression: Basic Strings -> Integers -> Input -> Arithmetic -> Expressions -> Floats
 // ==========================================================================
-const BASE_LEVELS = [
+const LEVELS = [
   {
     id: 1,
-    title: "First Steps: Hello C++",
+    title: "First Steps: Hello World",
     topic: "Basics",
     difficulty: "EASY",
-    desc: "Print <code>Hello, World!</code> to standard output.",
-    hint: "Use cout << \"Hello, World!\" << endl; in main().",
+    desc: "Print <code>Hello, World!</code> to standard output followed by a newline.",
+    hint: "Use cout << \"Hello, World!\" << endl; inside main().",
     examples: [
       { input: "(none)", output: "Hello, World!" }
     ],
@@ -41,27 +42,22 @@ int main() {
   },
   {
     id: 2,
-    title: "Sum of Two Numbers",
+    title: "Custom Message",
     topic: "Basics",
     difficulty: "EASY",
-    desc: "Read two integers <code>A</code> and <code>B</code> from standard input and print their sum.",
-    hint: "Read using cin >> a >> b; then print a + b.",
+    desc: "Print <code>Welcome to C++!</code> to standard output.",
+    hint: "Use cout << \"Welcome to C++!\" << endl;.",
     examples: [
-      { input: "3 5", output: "8" },
-      { input: "10 25", output: "35" }
+      { input: "(none)", output: "Welcome to C++!" }
     ],
     testCases: [
-      { input: "3 5", expected: "8" },
-      { input: "10 25", expected: "35" },
-      { input: "-4 12", expected: "8" },
-      { input: "100 200", expected: "300" }
+      { input: "", expected: "Welcome to C++!" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    int a, b;
-    // Read two integers from cin and print their sum
+    // Print "Welcome to C++!" to standard output
     
     return 0;
 }
@@ -69,27 +65,22 @@ int main() {
   },
   {
     id: 3,
-    title: "Even or Odd",
+    title: "Two Lines of Text",
     topic: "Basics",
     difficulty: "EASY",
-    desc: "Read integer <code>N</code>. If even print <code>EVEN</code>, if odd print <code>ODD</code>.",
-    hint: "Check if n % 2 == 0.",
+    desc: "Print two lines of text:<br><code>Hello</code><br><code>World</code>",
+    hint: "Use two separate cout statements or \\n.",
     examples: [
-      { input: "4", output: "EVEN" },
-      { input: "7", output: "ODD" }
+      { input: "(none)", output: "Hello\\nWorld" }
     ],
     testCases: [
-      { input: "4", expected: "EVEN" },
-      { input: "7", expected: "ODD" },
-      { input: "0", expected: "EVEN" },
-      { input: "99", expected: "ODD" }
+      { input: "", expected: "Hello\nWorld" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    int n;
-    // Read integer n and print EVEN or ODD
+    // Print "Hello" on line 1 and "World" on line 2
     
     return 0;
 }
@@ -97,27 +88,22 @@ int main() {
   },
   {
     id: 4,
-    title: "Max of Three Numbers",
+    title: "Three-Line Introduction",
     topic: "Basics",
     difficulty: "EASY",
-    desc: "Read three integers <code>A, B, C</code> and print the largest value.",
-    hint: "Use max({a, b, c}) or conditional if-else statements.",
+    desc: "Print the following three lines:<br><code>I am learning C++</code><br><code>It is fast</code><br><code>It is fun</code>",
+    hint: "Use cout << \"...\" << endl; for each line.",
     examples: [
-      { input: "3 9 5", output: "9" },
-      { input: "100 45 80", output: "100" }
+      { input: "(none)", output: "I am learning C++\\nIt is fast\\nIt is fun" }
     ],
     testCases: [
-      { input: "3 9 5", expected: "9" },
-      { input: "100 45 80", expected: "100" },
-      { input: "-5 -1 -10", expected: "-1" }
+      { input: "", expected: "I am learning C++\nIt is fast\nIt is fun" }
     ],
     starterCode: `#include <iostream>
-#include <algorithm>
 using namespace std;
 
 int main() {
-    int a, b, c;
-    // Read three integers and print the largest value
+    // Print the three required lines
     
     return 0;
 }
@@ -125,29 +111,22 @@ int main() {
   },
   {
     id: 5,
-    title: "Factorial of N",
-    topic: "Math",
+    title: "3x3 Star Box",
+    topic: "Basics",
     difficulty: "EASY",
-    desc: "Read integer <code>N</code> (1 <= N <= 12) and print <code>N!</code> (product from 1 to N).",
-    hint: "Initialize fact = 1 and multiply in a loop up to N.",
+    desc: "Print a 3x3 square of stars (*):<br><code>***</code><br><code>***</code><br><code>***</code>",
+    hint: "Print \"***\" three times, each on its own line.",
     examples: [
-      { input: "3", output: "6" },
-      { input: "5", output: "120" },
-      { input: "7", output: "5040" }
+      { input: "(none)", output: "***\\n***\\n***" }
     ],
     testCases: [
-      { input: "1", expected: "1" },
-      { input: "3", expected: "6" },
-      { input: "5", expected: "120" },
-      { input: "7", expected: "5040" },
-      { input: "10", expected: "3628800" }
+      { input: "", expected: "***\n***\n***" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    long long n;
-    // Read integer n and compute n! (factorial)
+    // Print 3 rows of 3 asterisks
     
     return 0;
 }
@@ -155,28 +134,22 @@ int main() {
   },
   {
     id: 6,
-    title: "Fibonacci Sequence (N terms)",
-    topic: "Loops",
+    title: "Print Integer Literal",
+    topic: "Variables",
     difficulty: "EASY",
-    desc: "Read integer <code>N</code> and print the first N terms of the Fibonacci sequence separated by spaces.",
-    hint: "Start a = 0, b = 1. In each step print a, next = a + b, a = b, b = next.",
+    desc: "Print the number <code>42</code> directly to standard output.",
+    hint: "Use cout << 42 << endl; without quotes.",
     examples: [
-      { input: "5", output: "0 1 1 2 3" },
-      { input: "7", output: "0 1 1 2 3 5 8" },
-      { input: "10", output: "0 1 1 2 3 5 8 13 21 34" }
+      { input: "(none)", output: "42" }
     ],
     testCases: [
-      { input: "1", expected: "0" },
-      { input: "5", expected: "0 1 1 2 3" },
-      { input: "7", expected: "0 1 1 2 3 5 8" },
-      { input: "10", expected: "0 1 1 2 3 5 8 13 21 34" }
+      { input: "", expected: "42" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    int n;
-    // Read n and print the first n Fibonacci numbers separated by space
+    // Print the number 42
     
     return 0;
 }
@@ -184,29 +157,22 @@ int main() {
   },
   {
     id: 7,
-    title: "Prime Number Checker",
-    topic: "Math",
+    title: "Three Numbers with Spaces",
+    topic: "Variables",
     difficulty: "EASY",
-    desc: "Read integer <code>N</code>. If prime print <code>PRIME</code>, else <code>NOT PRIME</code>.",
-    hint: "Check divisibility from 2 up to sqrt(N).",
+    desc: "Print the numbers <code>10 20 30</code> separated by single spaces on one line.",
+    hint: "Use cout << 10 << \" \" << 20 << \" \" << 30 << endl;.",
     examples: [
-      { input: "7", output: "PRIME" },
-      { input: "12", output: "NOT PRIME" },
-      { input: "29", output: "PRIME" }
+      { input: "(none)", output: "10 20 30" }
     ],
     testCases: [
-      { input: "1", expected: "NOT PRIME" },
-      { input: "2", expected: "PRIME" },
-      { input: "7", expected: "PRIME" },
-      { input: "12", expected: "NOT PRIME" },
-      { input: "97", expected: "PRIME" }
+      { input: "", expected: "10 20 30" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    int n;
-    // Read n and print PRIME if prime, else NOT PRIME
+    // Print 10 20 30 on a single line separated by spaces
     
     return 0;
 }
@@ -214,28 +180,22 @@ int main() {
   },
   {
     id: 8,
-    title: "Sum of Digits",
-    topic: "Math",
+    title: "Integer Variable",
+    topic: "Variables",
     difficulty: "EASY",
-    desc: "Read a positive integer <code>N</code> and print the sum of its digits.",
-    hint: "Extract digits using n % 10, add to sum, and divide n /= 10.",
+    desc: "Declare an integer variable <code>x = 100;</code> and print its value.",
+    hint: "Use int x = 100; cout << x << endl;.",
     examples: [
-      { input: "123", output: "6" },
-      { input: "4567", output: "22" },
-      { input: "987654", output: "39" }
+      { input: "(none)", output: "100" }
     ],
     testCases: [
-      { input: "5", expected: "5" },
-      { input: "123", expected: "6" },
-      { input: "4567", expected: "22" },
-      { input: "987654", expected: "39" }
+      { input: "", expected: "100" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    long long n;
-    // Read positive integer n and print sum of its digits
+    // Declare integer x = 100 and print it
     
     return 0;
 }
@@ -243,29 +203,22 @@ int main() {
   },
   {
     id: 9,
-    title: "Reverse String",
-    topic: "Strings",
+    title: "Variable with Text Label",
+    topic: "Variables",
     difficulty: "EASY",
-    desc: "Read a single word string <code>S</code> and print it in reverse.",
-    hint: "Use reverse(s.begin(), s.end()).",
+    desc: "Declare an integer <code>score = 95;</code> and print <code>Score: 95</code>.",
+    hint: "Use cout << \"Score: \" << score << endl;.",
     examples: [
-      { input: "hello", output: "olleh" },
-      { input: "apple", output: "elppa" }
+      { input: "(none)", output: "Score: 95" }
     ],
     testCases: [
-      { input: "hello", expected: "olleh" },
-      { input: "apple", expected: "elppa" },
-      { input: "racecar", expected: "racecar" },
-      { input: "xcoding", expected: "gnidocx" }
+      { input: "", expected: "Score: 95" }
     ],
     starterCode: `#include <iostream>
-#include <string>
-#include <algorithm>
 using namespace std;
 
 int main() {
-    string s;
-    // Read string s and print it reversed
+    // Declare score = 95 and print "Score: 95"
     
     return 0;
 }
@@ -273,29 +226,22 @@ int main() {
   },
   {
     id: 10,
-    title: "Palindrome String Check",
-    topic: "Strings",
+    title: "Reassigning a Variable",
+    topic: "Variables",
     difficulty: "EASY",
-    desc: "Read string <code>S</code>. If palindrome print <code>PALINDROME</code>, else <code>NOT PALINDROME</code>.",
-    hint: "Compare string with its reversed copy.",
+    desc: "Declare <code>int val = 50;</code>, reassign it to <code>99</code>, and print <code>val</code>.",
+    hint: "Assign val = 99 before printing.",
     examples: [
-      { input: "racecar", output: "PALINDROME" },
-      { input: "world", output: "NOT PALINDROME" }
+      { input: "(none)", output: "99" }
     ],
     testCases: [
-      { input: "racecar", expected: "PALINDROME" },
-      { input: "world", expected: "NOT PALINDROME" },
-      { input: "12321", expected: "PALINDROME" },
-      { input: "noon", expected: "PALINDROME" }
+      { input: "", expected: "99" }
     ],
     starterCode: `#include <iostream>
-#include <string>
-#include <algorithm>
 using namespace std;
 
 int main() {
-    string s;
-    // Read string s and print PALINDROME or NOT PALINDROME
+    // Declare val = 50, update val = 99, and print val
     
     return 0;
 }
@@ -303,29 +249,22 @@ int main() {
   },
   {
     id: 11,
-    title: "Array Maximum Element",
-    topic: "Arrays",
+    title: "Two Variables Sentence",
+    topic: "Variables",
     difficulty: "EASY",
-    desc: "Read array size <code>N</code> followed by N integers. Print the maximum value.",
-    hint: "Track maxVal = arr[0] or use max_element.",
+    desc: "Declare two integer variables <code>a = 7</code> and <code>b = 3</code>. Print <code>7 and 3</code>.",
+    hint: "Use cout << a << \" and \" << b << endl;.",
     examples: [
-      { input: "5\n10 45 23 89 12", output: "89" },
-      { input: "3\n-5 -2 -10", output: "-2" }
+      { input: "(none)", output: "7 and 3" }
     ],
     testCases: [
-      { input: "5\n10 45 23 89 12", expected: "89" },
-      { input: "3\n-5 -2 -10", expected: "-2" },
-      { input: "1\n42", expected: "42" },
-      { input: "6\n7 3 9 1 99 23", expected: "99" }
+      { input: "", expected: "7 and 3" }
     ],
     starterCode: `#include <iostream>
-#include <vector>
-#include <algorithm>
 using namespace std;
 
 int main() {
-    int n;
-    // Read array size n and n integers, print maximum element
+    // Declare a = 7, b = 3 and print "7 and 3"
     
     return 0;
 }
@@ -333,27 +272,22 @@ int main() {
   },
   {
     id: 12,
-    title: "Array Sum & Average",
-    topic: "Arrays",
+    title: "Constant Addition",
+    topic: "Variables",
     difficulty: "EASY",
-    desc: "Read array size <code>N</code> and N integers. Print the total sum.",
-    hint: "Accumulate sum += val in a loop.",
+    desc: "Print the result of the addition <code>25 + 75</code> directly to standard output.",
+    hint: "Use cout << 25 + 75 << endl;.",
     examples: [
-      { input: "4\n10 20 30 40", output: "100" },
-      { input: "3\n1 2 3", output: "6" }
+      { input: "(none)", output: "100" }
     ],
     testCases: [
-      { input: "4\n10 20 30 40", expected: "100" },
-      { input: "3\n1 2 3", expected: "6" },
-      { input: "5\n5 5 5 5 5", expected: "25" }
+      { input: "", expected: "100" }
     ],
     starterCode: `#include <iostream>
-#include <vector>
 using namespace std;
 
 int main() {
-    int n;
-    // Read n integers and print their total sum
+    // Print 25 + 75
     
     return 0;
 }
@@ -361,27 +295,27 @@ int main() {
   },
   {
     id: 13,
-    title: "Count Occurrences",
-    topic: "Arrays",
+    title: "Echo Integer Input",
+    topic: "Input",
     difficulty: "EASY",
-    desc: "Read array size <code>N</code>, N integers, and target <code>X</code>. Print how many times X appears.",
-    hint: "Count elements equal to X in a loop.",
+    desc: "Read a single integer <code>N</code> from standard input and print it.",
+    hint: "Use int n; cin >> n; cout << n << endl;.",
     examples: [
-      { input: "6\n1 2 3 2 4 2\n2", output: "3" },
-      { input: "4\n5 5 5 5\n5", output: "4" }
+      { input: "42", output: "42" },
+      { input: "-9", output: "-9" }
     ],
     testCases: [
-      { input: "6\n1 2 3 2 4 2\n2", expected: "3" },
-      { input: "4\n5 5 5 5\n5", expected: "4" },
-      { input: "3\n1 2 3\n9", expected: "0" }
+      { input: "42", expected: "42" },
+      { input: "-9", expected: "-9" },
+      { input: "0", expected: "0" },
+      { input: "1005", expected: "1005" }
     ],
     starterCode: `#include <iostream>
-#include <vector>
 using namespace std;
 
 int main() {
     int n;
-    // Read n integers and target x, print occurrence count
+    // Read integer n from cin and print it
     
     return 0;
 }
@@ -389,29 +323,27 @@ int main() {
   },
   {
     id: 14,
-    title: "Binary to Decimal",
-    topic: "Bitwise",
+    title: "Echo with Label",
+    topic: "Input",
     difficulty: "EASY",
-    desc: "Read a binary string (e.g. <code>1101</code>) and print its decimal value.",
-    hint: "Multiply dec by 2 and add each bit from left to right.",
+    desc: "Read an integer <code>N</code> and print <code>Number: N</code>.",
+    hint: "Use cout << \"Number: \" << n << endl;.",
     examples: [
-      { input: "101", output: "5" },
-      { input: "1111", output: "15" },
-      { input: "110101", output: "53" }
+      { input: "25", output: "Number: 25" },
+      { input: "-3", output: "Number: -3" }
     ],
     testCases: [
-      { input: "101", expected: "5" },
-      { input: "1111", expected: "15" },
-      { input: "110101", expected: "53" },
-      { input: "1000000", expected: "64" }
+      { input: "25", expected: "Number: 25" },
+      { input: "-3", expected: "Number: -3" },
+      { input: "100", expected: "Number: 100" },
+      { input: "0", expected: "Number: 0" }
     ],
     starterCode: `#include <iostream>
-#include <string>
 using namespace std;
 
 int main() {
-    string bin;
-    // Read binary string and print decimal integer
+    int n;
+    // Read n and print "Number: <n>"
     
     return 0;
 }
@@ -419,28 +351,26 @@ int main() {
   },
   {
     id: 15,
-    title: "Count Set Bits (Hamming Weight)",
-    topic: "Bitwise",
+    title: "Read Two Integers",
+    topic: "Input",
     difficulty: "EASY",
-    desc: "Read integer <code>N</code> and print the number of 1-bits in its binary representation.",
-    hint: "Use n & (n - 1) to clear the lowest set bit in a loop.",
+    desc: "Read two integers <code>A</code> and <code>B</code> and print them separated by a single space.",
+    hint: "Use cin >> a >> b; cout << a << \" \" << b << endl;.",
     examples: [
-      { input: "5", output: "2" },
-      { input: "7", output: "3" },
-      { input: "16", output: "1" }
+      { input: "12 34", output: "12 34" }
     ],
     testCases: [
-      { input: "5", expected: "2" },
-      { input: "7", expected: "3" },
-      { input: "16", expected: "1" },
-      { input: "255", expected: "8" }
+      { input: "12 34", expected: "12 34" },
+      { input: "5 99", expected: "5 99" },
+      { input: "-10 20", expected: "-10 20" },
+      { input: "0 0", expected: "0 0" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    long long n;
-    // Read integer n and print number of set bits (1s)
+    int a, b;
+    // Read a and b and print them separated by space
     
     return 0;
 }
@@ -448,25 +378,27 @@ int main() {
   },
   {
     id: 16,
-    title: "FizzBuzz",
-    topic: "Loops",
+    title: "Reverse Order Output",
+    topic: "Input",
     difficulty: "EASY",
-    desc: "Read <code>N</code>. For 1 to N, print Fizz (div 3), Buzz (div 5), FizzBuzz (both), or the number.",
-    hint: "Check i % 15 == 0 first.",
+    desc: "Read two integers <code>A</code> and <code>B</code>, then print <code>B</code> followed by <code>A</code> separated by a space.",
+    hint: "Read into a and b, then print b << \" \" << a.",
     examples: [
-      { input: "5", output: "1 2 Fizz 4 Buzz" },
-      { input: "15", output: "1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz" }
+      { input: "10 20", output: "20 10" },
+      { input: "1 99", output: "99 1" }
     ],
     testCases: [
-      { input: "5", expected: "1 2 Fizz 4 Buzz" },
-      { input: "15", expected: "1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz" }
+      { input: "10 20", expected: "20 10" },
+      { input: "1 99", expected: "99 1" },
+      { input: "-5 8", expected: "8 -5" },
+      { input: "7 7", expected: "7 7" }
     ],
     starterCode: `#include <iostream>
 using namespace std;
 
 int main() {
-    int n;
-    // Read n and print FizzBuzz sequence from 1 to n
+    int a, b;
+    // Read a and b, print b then a
     
     return 0;
 }
@@ -474,28 +406,25 @@ int main() {
   },
   {
     id: 17,
-    title: "GCD (Greatest Common Divisor)",
-    topic: "Math",
+    title: "Three Integers on Separate Lines",
+    topic: "Input",
     difficulty: "EASY",
-    desc: "Read two positive integers <code>A</code> and <code>B</code>. Print their greatest common divisor.",
-    hint: "Use Euclidean algorithm: while(b) { a %= b; swap(a, b); }",
+    desc: "Read three integers <code>A</code>, <code>B</code>, and <code>C</code>, and print each on its own line.",
+    hint: "Use cin >> a >> b >> c; and print each followed by endl.",
     examples: [
-      { input: "12 18", output: "6" },
-      { input: "24 36", output: "12" }
+      { input: "10 20 30", output: "10\\n20\\n30" }
     ],
     testCases: [
-      { input: "12 18", expected: "6" },
-      { input: "24 36", expected: "12" },
-      { input: "17 19", expected: "1" },
-      { input: "100 25", expected: "25" }
+      { input: "10 20 30", expected: "10\n20\n30" },
+      { input: "1 2 3", expected: "1\n2\n3" },
+      { input: "-5 0 5", expected: "-5\n0\n5" }
     ],
     starterCode: `#include <iostream>
-#include <algorithm>
 using namespace std;
 
 int main() {
-    long long a, b;
-    // Read two integers a and b, print their GCD
+    int a, b, c;
+    // Read three integers and print each on a new line
     
     return 0;
 }
@@ -503,27 +432,27 @@ int main() {
   },
   {
     id: 18,
-    title: "LCM (Least Common Multiple)",
-    topic: "Math",
+    title: "Next Integer (+1)",
+    topic: "Arithmetic",
     difficulty: "EASY",
-    desc: "Read two positive integers <code>A</code> and <code>B</code>. Print their least common multiple.",
-    hint: "LCM(a, b) = (a * b) / GCD(a, b).",
+    desc: "Read an integer <code>N</code> and print the next integer (<code>N + 1</code>).",
+    hint: "Read n and output n + 1.",
     examples: [
-      { input: "4 6", output: "12" },
-      { input: "5 7", output: "35" }
+      { input: "7", output: "8" },
+      { input: "-1", output: "0" }
     ],
     testCases: [
-      { input: "4 6", expected: "12" },
-      { input: "5 7", expected: "35" },
-      { input: "10 15", expected: "30" }
+      { input: "7", expected: "8" },
+      { input: "-1", expected: "0" },
+      { input: "99", expected: "100" },
+      { input: "0", expected: "1" }
     ],
     starterCode: `#include <iostream>
-#include <algorithm>
 using namespace std;
 
 int main() {
-    long long a, b;
-    // Read two integers a and b, print their LCM
+    int n;
+    // Read n and print n + 1
     
     return 0;
 }
@@ -531,27 +460,27 @@ int main() {
   },
   {
     id: 19,
-    title: "Binary Search",
-    topic: "Algorithms",
+    title: "Previous Integer (-1)",
+    topic: "Arithmetic",
     difficulty: "EASY",
-    desc: "Read sorted array size <code>N</code>, N integers, and target <code>X</code>. Print 0-based index or -1.",
-    hint: "Use binary search with low and high bounds.",
+    desc: "Read an integer <code>N</code> and print the preceding integer (<code>N - 1</code>).",
+    hint: "Read n and output n - 1.",
     examples: [
-      { input: "5\n10 20 30 40 50\n30", output: "2" },
-      { input: "4\n1 3 5 7\n4", output: "-1" }
+      { input: "10", output: "9" },
+      { input: "0", output: "-1" }
     ],
     testCases: [
-      { input: "5\n10 20 30 40 50\n30", expected: "2" },
-      { input: "4\n1 3 5 7\n4", expected: "-1" },
-      { input: "1\n99\n99", expected: "0" }
+      { input: "10", expected: "9" },
+      { input: "0", expected: "-1" },
+      { input: "-5", expected: "-6" },
+      { input: "100", expected: "99" }
     ],
     starterCode: `#include <iostream>
-#include <vector>
 using namespace std;
 
 int main() {
     int n;
-    // Read sorted array of size n, n integers, and target, print 0-based index or -1
+    // Read n and print n - 1
     
     return 0;
 }
@@ -559,88 +488,868 @@ int main() {
   },
   {
     id: 20,
-    title: "Maximum Subarray Sum (Kadane's)",
-    topic: "Algorithms",
-    difficulty: "MEDIUM",
-    desc: "Read array size <code>N</code> and N integers. Print the maximum sum of any contiguous subarray.",
-    hint: "Maintain currentSum = max(arr[i], currentSum + arr[i]).",
+    title: "Double the Number",
+    topic: "Arithmetic",
+    difficulty: "EASY",
+    desc: "Read an integer <code>N</code> and print its double (<code>N * 2</code>).",
+    hint: "Use cout << n * 2 << endl;.",
     examples: [
-      { input: "8\n-2 1 -3 4 -1 2 1 -5", output: "6" },
-      { input: "5\n5 4 -1 7 8", output: "23" }
+      { input: "6", output: "12" },
+      { input: "-4", output: "-8" }
     ],
     testCases: [
-      { input: "8\n-2 1 -3 4 -1 2 1 -5", expected: "6" },
-      { input: "5\n5 4 -1 7 8", expected: "23" },
-      { input: "3\n-3 -2 -5", expected: "-2" }
+      { input: "6", expected: "12" },
+      { input: "-4", expected: "-8" },
+      { input: "0", expected: "0" },
+      { input: "25", expected: "50" }
     ],
     starterCode: `#include <iostream>
-#include <vector>
-#include <algorithm>
 using namespace std;
 
 int main() {
     int n;
-    // Read array of size n and find maximum contiguous subarray sum
+    // Read n and print n * 2
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 21,
+    title: "Triple the Number",
+    topic: "Arithmetic",
+    difficulty: "EASY",
+    desc: "Read an integer <code>N</code> and print its triple (<code>N * 3</code>).",
+    hint: "Use cout << n * 3 << endl;.",
+    examples: [
+      { input: "4", output: "12" },
+      { input: "-3", output: "-9" }
+    ],
+    testCases: [
+      { input: "4", expected: "12" },
+      { input: "-3", expected: "-9" },
+      { input: "10", expected: "30" },
+      { input: "0", expected: "0" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    // Read n and print n * 3
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 22,
+    title: "Sum of Two Integers",
+    topic: "Arithmetic",
+    difficulty: "EASY",
+    desc: "Read two integers <code>A</code> and <code>B</code> from standard input and print their sum (<code>A + B</code>).",
+    hint: "Use cin >> a >> b; cout << a + b << endl;.",
+    examples: [
+      { input: "3 5", output: "8" },
+      { input: "20 30", output: "50" }
+    ],
+    testCases: [
+      { input: "3 5", expected: "8" },
+      { input: "20 30", expected: "50" },
+      { input: "-4 10", expected: "6" },
+      { input: "100 250", expected: "350" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b;
+    // Read a and b and print a + b
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 23,
+    title: "Difference of Two Integers",
+    topic: "Arithmetic",
+    difficulty: "EASY",
+    desc: "Read two integers <code>A</code> and <code>B</code> and print <code>A - B</code>.",
+    hint: "Use cout << a - b << endl;.",
+    examples: [
+      { input: "10 3", output: "7" },
+      { input: "4 9", output: "-5" }
+    ],
+    testCases: [
+      { input: "10 3", expected: "7" },
+      { input: "4 9", expected: "-5" },
+      { input: "50 50", expected: "0" },
+      { input: "-5 -12", expected: "7" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b;
+    // Read a and b and print a - b
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 24,
+    title: "Product of Two Integers",
+    topic: "Arithmetic",
+    difficulty: "EASY",
+    desc: "Read two integers <code>A</code> and <code>B</code> and print their product (<code>A * B</code>).",
+    hint: "Use cout << a * b << endl;.",
+    examples: [
+      { input: "6 7", output: "42" },
+      { input: "-3 8", output: "-24" }
+    ],
+    testCases: [
+      { input: "6 7", expected: "42" },
+      { input: "-3 8", expected: "-24" },
+      { input: "12 12", expected: "144" },
+      { input: "0 99", expected: "0" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b;
+    // Read a and b and print a * b
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 25,
+    title: "Integer Division Quotient",
+    topic: "Arithmetic",
+    difficulty: "EASY",
+    desc: "Read two integers <code>A</code> and <code>B</code> (where <code>B != 0</code>) and print the integer quotient <code>A / B</code>.",
+    hint: "Integer division a / b drops any decimal portion.",
+    examples: [
+      { input: "17 5", output: "3" },
+      { input: "20 4", output: "5" }
+    ],
+    testCases: [
+      { input: "17 5", expected: "3" },
+      { input: "20 4", expected: "5" },
+      { input: "7 2", expected: "3" },
+      { input: "3 10", expected: "0" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b;
+    // Read a and b and print integer division a / b
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 26,
+    title: "Remainder (Modulo %)",
+    topic: "Arithmetic",
+    difficulty: "EASY",
+    desc: "Read two positive integers <code>A</code> and <code>B</code> and print the remainder <code>A % B</code>.",
+    hint: "Use the % operator: cout << a % b << endl;.",
+    examples: [
+      { input: "17 5", output: "2" },
+      { input: "20 4", output: "0" }
+    ],
+    testCases: [
+      { input: "17 5", expected: "2" },
+      { input: "20 4", expected: "0" },
+      { input: "7 2", expected: "1" },
+      { input: "100 7", expected: "2" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b;
+    // Read a and b and print remainder a % b
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 27,
+    title: "Quotient and Remainder",
+    topic: "Arithmetic",
+    difficulty: "EASY",
+    desc: "Read two positive integers <code>A</code> and <code>B</code>. Print quotient and remainder separated by a space.",
+    hint: "Use cout << a / b << \" \" << a % b << endl;.",
+    examples: [
+      { input: "19 4", output: "4 3" },
+      { input: "10 2", output: "5 0" }
+    ],
+    testCases: [
+      { input: "19 4", expected: "4 3" },
+      { input: "10 2", expected: "5 0" },
+      { input: "25 6", expected: "4 1" },
+      { input: "9 10", expected: "0 9" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b;
+    // Read a and b, print quotient and remainder separated by space
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 28,
+    title: "Linear Formula: 2x + 5",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read an integer <code>X</code> and compute <code>2 * X + 5</code>.",
+    hint: "Use cout << 2 * x + 5 << endl;.",
+    examples: [
+      { input: "3", output: "11" },
+      { input: "0", output: "5" }
+    ],
+    testCases: [
+      { input: "3", expected: "11" },
+      { input: "0", expected: "5" },
+      { input: "10", expected: "25" },
+      { input: "-2", expected: "1" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int x;
+    // Read x and print 2 * x + 5
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 29,
+    title: "Evaluate: a * x + b",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read three integers <code>A</code>, <code>B</code>, and <code>X</code>. Compute and print <code>A * X + B</code>.",
+    hint: "Use cin >> a >> b >> x; cout << a * x + b << endl;.",
+    examples: [
+      { input: "3 4 5", output: "19" },
+      { input: "2 10 3", output: "16" }
+    ],
+    testCases: [
+      { input: "3 4 5", expected: "19" },
+      { input: "2 10 3", expected: "16" },
+      { input: "0 7 99", expected: "7" },
+      { input: "5 -3 4", expected: "17" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b, x;
+    // Read a, b, x and print a * x + b
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 30,
+    title: "Square of a Number",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read an integer <code>N</code> and print its square (<code>N * N</code>).",
+    hint: "Use cout << n * n << endl;.",
+    examples: [
+      { input: "5", output: "25" },
+      { input: "-4", output: "16" }
+    ],
+    testCases: [
+      { input: "5", expected: "25" },
+      { input: "-4", expected: "16" },
+      { input: "12", expected: "144" },
+      { input: "0", expected: "0" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    // Read n and print n * n
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 31,
+    title: "Cube of a Number",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read an integer <code>N</code> and print its cube (<code>N * N * N</code>).",
+    hint: "Use cout << n * n * n << endl;.",
+    examples: [
+      { input: "3", output: "27" },
+      { input: "-2", output: "-8" }
+    ],
+    testCases: [
+      { input: "3", expected: "27" },
+      { input: "-2", expected: "-8" },
+      { input: "5", expected: "125" },
+      { input: "10", expected: "1000" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    // Read n and print n * n * n
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 32,
+    title: "Perimeter of a Square",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read side length <code>S</code> of a square. Print its perimeter (<code>4 * S</code>).",
+    hint: "Perimeter is 4 * s.",
+    examples: [
+      { input: "5", output: "20" },
+      { input: "12", output: "48" }
+    ],
+    testCases: [
+      { input: "5", expected: "20" },
+      { input: "12", expected: "48" },
+      { input: "1", expected: "4" },
+      { input: "25", expected: "100" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int s;
+    // Read side s and print 4 * s
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 33,
+    title: "Area of a Square",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read side length <code>S</code> of a square. Print its area (<code>S * S</code>).",
+    hint: "Area is s * s.",
+    examples: [
+      { input: "6", output: "36" },
+      { input: "9", output: "81" }
+    ],
+    testCases: [
+      { input: "6", expected: "36" },
+      { input: "9", expected: "81" },
+      { input: "10", expected: "100" },
+      { input: "15", expected: "225" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int s;
+    // Read side s and print s * s
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 34,
+    title: "Perimeter of a Rectangle",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read length <code>L</code> and width <code>W</code>. Print the perimeter <code>2 * (L + W)</code>.",
+    hint: "Use cout << 2 * (l + w) << endl;.",
+    examples: [
+      { input: "4 7", output: "22" },
+      { input: "10 20", output: "60" }
+    ],
+    testCases: [
+      { input: "4 7", expected: "22" },
+      { input: "10 20", expected: "60" },
+      { input: "5 5", expected: "20" },
+      { input: "12 8", expected: "40" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int l, w;
+    // Read length and width, print perimeter 2 * (l + w)
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 35,
+    title: "Area of a Rectangle",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read length <code>L</code> and width <code>W</code>. Print the area (<code>L * W</code>).",
+    hint: "Use cout << l * w << endl;.",
+    examples: [
+      { input: "5 8", output: "40" },
+      { input: "10 15", output: "150" }
+    ],
+    testCases: [
+      { input: "5 8", expected: "40" },
+      { input: "10 15", expected: "150" },
+      { input: "6 6", expected: "36" },
+      { input: "20 4", expected: "80" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int l, w;
+    // Read length and width, print area l * w
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 36,
+    title: "Sum of Three Integers",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read three integers <code>A</code>, <code>B</code>, and <code>C</code> and print their total sum.",
+    hint: "Use cin >> a >> b >> c; cout << a + b + c << endl;.",
+    examples: [
+      { input: "1 2 3", output: "6" },
+      { input: "10 25 15", output: "50" }
+    ],
+    testCases: [
+      { input: "1 2 3", expected: "6" },
+      { input: "10 25 15", expected: "50" },
+      { input: "-5 10 20", expected: "25" },
+      { input: "100 200 300", expected: "600" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b, c;
+    // Read three integers and print their sum
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 37,
+    title: "Hours & Minutes to Minutes",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read two integers: <code>hours</code> and <code>minutes</code>. Print total minutes (<code>hours * 60 + minutes</code>).",
+    hint: "Multiply hours by 60 and add minutes.",
+    examples: [
+      { input: "2 30", output: "150" },
+      { input: "1 45", output: "105" }
+    ],
+    testCases: [
+      { input: "2 30", expected: "150" },
+      { input: "1 45", expected: "105" },
+      { input: "0 50", expected: "50" },
+      { input: "5 0", expected: "300" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int hours, minutes;
+    // Read hours and minutes, print total minutes
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 38,
+    title: "Minutes to Hours & Minutes",
+    topic: "Expressions",
+    difficulty: "EASY",
+    desc: "Read total minutes <code>M</code>. Print hours and remaining minutes separated by a space.",
+    hint: "Use cout << m / 60 << \" \" << m % 60 << endl;.",
+    examples: [
+      { input: "135", output: "2 15" },
+      { input: "60", output: "1 0" }
+    ],
+    testCases: [
+      { input: "135", expected: "2 15" },
+      { input: "60", expected: "1 0" },
+      { input: "45", expected: "0 45" },
+      { input: "300", expected: "5 0" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int m;
+    // Read total minutes m and print hours and remaining minutes
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 39,
+    title: "Print Float Literal",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Print the decimal floating-point number <code>3.14</code> directly to standard output.",
+    hint: "Use cout << 3.14 << endl;.",
+    examples: [
+      { input: "(none)", output: "3.14" }
+    ],
+    testCases: [
+      { input: "", expected: "3.14" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Print the decimal number 3.14
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 40,
+    title: "Double Variable Declaration",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Declare a variable of type <code>double</code> named <code>price = 19.99;</code> and print its value.",
+    hint: "Use double price = 19.99; cout << price << endl;.",
+    examples: [
+      { input: "(none)", output: "19.99" }
+    ],
+    testCases: [
+      { input: "", expected: "19.99" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Declare double price = 19.99 and print it
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 41,
+    title: "Read Floating-Point Number",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read a single floating-point number (type <code>double</code>) from standard input and print it.",
+    hint: "Use double x; cin >> x; cout << x << endl;.",
+    examples: [
+      { input: "7.25", output: "7.25" },
+      { input: "-0.5", output: "-0.5" }
+    ],
+    testCases: [
+      { input: "7.25", expected: "7.25" },
+      { input: "-0.5", expected: "-0.5" },
+      { input: "3.1415", expected: "3.1415" },
+      { input: "100.5", expected: "100.5" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    double x;
+    // Read double x and print it
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 42,
+    title: "Float Addition",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read two <code>double</code> numbers <code>A</code> and <code>B</code> from standard input and print their sum.",
+    hint: "Use cin >> a >> b; cout << a + b << endl;.",
+    examples: [
+      { input: "3.2 4.1", output: "7.3" },
+      { input: "10.25 5.5", output: "15.75" }
+    ],
+    testCases: [
+      { input: "3.2 4.1", expected: "7.3" },
+      { input: "10.25 5.5", expected: "15.75" },
+      { input: "1.5 2.5", expected: "4" },
+      { input: "-2.5 7.5", expected: "5" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    double a, b;
+    // Read two doubles and print their sum
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 43,
+    title: "Float Multiplication",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read two <code>double</code> numbers <code>A</code> and <code>B</code> and print their product (<code>A * B</code>).",
+    hint: "Use cout << a * b << endl;.",
+    examples: [
+      { input: "1.5 3.0", output: "4.5" },
+      { input: "0.5 0.5", output: "0.25" }
+    ],
+    testCases: [
+      { input: "1.5 3.0", expected: "4.5" },
+      { input: "0.5 0.5", expected: "0.25" },
+      { input: "2.5 4.0", expected: "10" },
+      { input: "10.0 2.5", expected: "25" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    double a, b;
+    // Read two doubles and print their product
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 44,
+    title: "Decimal Division with Doubles",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read two <code>double</code> numbers <code>A</code> and <code>B</code> (where <code>B != 0</code>) and print <code>A / B</code>.",
+    hint: "Double division computes the exact decimal fraction.",
+    examples: [
+      { input: "7.0 2.0", output: "3.5" },
+      { input: "9.0 4.0", output: "2.25" }
+    ],
+    testCases: [
+      { input: "7.0 2.0", expected: "3.5" },
+      { input: "9.0 4.0", expected: "2.25" },
+      { input: "1.0 4.0", expected: "0.25" },
+      { input: "15.0 6.0", expected: "2.5" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    double a, b;
+    // Read two doubles and print a / b
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 45,
+    title: "Integer to Float Typecast Division",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read two integers <code>A</code> and <code>B</code>. Cast <code>A</code> to <code>double</code> and print exact division <code>(double)A / B</code>.",
+    hint: "Use (double)a / b to avoid integer truncation.",
+    examples: [
+      { input: "5 2", output: "2.5" },
+      { input: "7 4", output: "1.75" }
+    ],
+    testCases: [
+      { input: "5 2", expected: "2.5" },
+      { input: "7 4", expected: "1.75" },
+      { input: "9 2", expected: "4.5" },
+      { input: "1 2", expected: "0.5" }
+    ],
+    starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b;
+    // Read integers a and b, cast to double and print exact division
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 46,
+    title: "Formatted Decimal (setprecision)",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read a <code>double X</code>. Using <code>&lt;iomanip&gt;</code>, print <code>X</code> formatted to exactly 2 decimal places using <code>fixed</code> and <code>setprecision(2)</code>.",
+    hint: "Include <iomanip> and do: cout << fixed << setprecision(2) << x << endl;",
+    examples: [
+      { input: "3.1", output: "3.10" },
+      { input: "12.3456", output: "12.35" }
+    ],
+    testCases: [
+      { input: "3.1", expected: "3.10" },
+      { input: "12.3456", expected: "12.35" },
+      { input: "5", expected: "5.00" },
+      { input: "0", expected: "0.00" }
+    ],
+    starterCode: `#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main() {
+    double x;
+    // Read double x and print formatted to 2 decimal places
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 47,
+    title: "Average of Two Integers (2 Decimals)",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read two integers <code>A</code> and <code>B</code>. Calculate their average as a float and print it formatted to 2 decimal places.",
+    hint: "Average is (a + b) / 2.0. Format using fixed and setprecision(2).",
+    examples: [
+      { input: "4 5", output: "4.50" },
+      { input: "10 15", output: "12.50" }
+    ],
+    testCases: [
+      { input: "4 5", expected: "4.50" },
+      { input: "10 15", expected: "12.50" },
+      { input: "20 30", expected: "25.00" },
+      { input: "1 2", expected: "1.50" }
+    ],
+    starterCode: `#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main() {
+    int a, b;
+    // Read two integers, compute float average, print with 2 decimal places
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 48,
+    title: "Percentage Calculator (2 Decimals)",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read two <code>double</code> values: <code>obtainedMarks</code> and <code>totalMarks</code>. Calculate percentage <code>(obtained / total) * 100.0</code> and print with 2 decimal places.",
+    hint: "Formula: (obtained / total) * 100.0. Use fixed and setprecision(2).",
+    examples: [
+      { input: "45 50", output: "90.00" },
+      { input: "37 40", output: "92.50" }
+    ],
+    testCases: [
+      { input: "45 50", expected: "90.00" },
+      { input: "37 40", expected: "92.50" },
+      { input: "18 25", expected: "72.00" },
+      { input: "1 3", expected: "33.33" }
+    ],
+    starterCode: `#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main() {
+    double obtained, total;
+    // Read obtained and total marks, compute percentage, print with 2 decimal places
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 49,
+    title: "Celsius to Fahrenheit (2 Decimals)",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read a temperature in Celsius <code>C</code> (type <code>double</code>). Convert to Fahrenheit using <code>F = (C * 9.0 / 5.0) + 32.0</code> and print with 2 decimal places.",
+    hint: "Formula: (c * 9.0 / 5.0) + 32.0. Use fixed and setprecision(2).",
+    examples: [
+      { input: "0", output: "32.00" },
+      { input: "100", output: "212.00" }
+    ],
+    testCases: [
+      { input: "0", expected: "32.00" },
+      { input: "100", expected: "212.00" },
+      { input: "37", expected: "98.60" },
+      { input: "-40", expected: "-40.00" }
+    ],
+    starterCode: `#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main() {
+    double c;
+    // Read Celsius temperature, convert to Fahrenheit, print with 2 decimal places
+    
+    return 0;
+}
+`
+  },
+  {
+    id: 50,
+    title: "Body Mass Index (BMI) (2 Decimals)",
+    topic: "Floating Point",
+    difficulty: "EASY",
+    desc: "Read two floating-point numbers: <code>weight</code> (in kg) and <code>height</code> (in meters). Calculate BMI using formula <code>BMI = weight / (height * height)</code> and print formatted to 2 decimal places.",
+    hint: "Formula: weight / (height * height). Use fixed and setprecision(2).",
+    examples: [
+      { input: "70 1.75", output: "22.86" },
+      { input: "85 1.80", output: "26.23" }
+    ],
+    testCases: [
+      { input: "70 1.75", expected: "22.86" },
+      { input: "85 1.80", expected: "26.23" },
+      { input: "55 1.60", expected: "21.48" },
+      { input: "90 1.90", expected: "24.93" }
+    ],
+    starterCode: `#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main() {
+    double weight, height;
+    // Read weight (kg) and height (m), compute BMI, print with 2 decimal places
     
     return 0;
 }
 `
   }
 ];
-
-// Procedural expansion to 100 levels
-function generateFullLevelsCatalog() {
-  const catalog = [...BASE_LEVELS];
-  const templates = [
-    { title: "Two Sum Target Check", topic: "Arrays", diff: "MEDIUM", desc: "Read array size N, N numbers, and target. Print YES if two numbers sum to target, else NO." },
-    { title: "Longest Word in Sentence", topic: "Strings", diff: "EASY", desc: "Read string and print length of the longest word." },
-    { title: "Merge Two Sorted Arrays", topic: "Arrays", diff: "MEDIUM", desc: "Read two sorted arrays and print the merged sorted sequence." },
-    { title: "Move Zeros to End", topic: "Arrays", diff: "EASY", desc: "Read array and move all 0s to the end preserving relative order of other elements." },
-    { title: "Power of Two Check", topic: "Bitwise", diff: "EASY", desc: "Read integer N. Print YES if N is a power of 2, else NO." },
-    { title: "Valid Anagram", topic: "Strings", diff: "EASY", desc: "Read two strings. Print YES if they are anagrams, else NO." },
-    { title: "Single Non-Repeating Number", topic: "Bitwise", diff: "MEDIUM", desc: "Read array where every element appears twice except one. Find and print the unique number." },
-    { title: "Climbing Stairs (DP)", topic: "DP", diff: "MEDIUM", desc: "Read N steps. You can climb 1 or 2 steps each time. Print distinct ways to reach top." },
-    { title: "Matrix Transpose", topic: "Arrays", diff: "MEDIUM", desc: "Read N x M matrix and print its transpose matrix." },
-    { title: "Character Frequency Count", topic: "Strings", diff: "EASY", desc: "Read string and print total count of distinct characters." }
-  ];
-
-  for (let i = catalog.length + 1; i <= 100; ++i) {
-    const tmpl = templates[(i - 1) % templates.length];
-    catalog.push({
-      id: i,
-      title: `${tmpl.title} ${Math.floor(i / 10) > 2 ? '#' + (i % 10 + 1) : ''}`.trim(),
-      topic: tmpl.topic,
-      difficulty: tmpl.diff,
-      desc: tmpl.desc,
-      hint: `Use optimized ${tmpl.topic.toLowerCase()} techniques for high performance.`,
-      examples: [
-        { input: "5\n1 2 3 4 5", output: "15" },
-        { input: "3\n10 20 30", output: "60" }
-      ],
-      testCases: [
-        { input: "5\n1 2 3 4 5", expected: "15" },
-        { input: "3\n10 20 30", expected: "60" },
-        { input: "1\n42", expected: "42" }
-      ],
-      starterCode: `#include <iostream>
-#include <vector>
-#include <string>
-#include <algorithm>
-using namespace std;
-
-int main() {
-    // Read input and write your solution here
-    
-    return 0;
-}
-`
-    });
-  }
-
-  return catalog;
-}
-
-const LEVELS = generateFullLevelsCatalog();
 
 // Global Application State
 const state = {
@@ -1224,7 +1933,7 @@ function renderLevelsMap() {
   });
 }
 
-// Render Level Train Stepper Track (Dropdown Navigation for 100+ Levels)
+// Render Level Train Stepper Track (Dropdown Navigation for 50 Levels)
 function renderLevelTrain() {
   const track = document.getElementById('level-train-track');
   const container = document.getElementById('level-train-container');

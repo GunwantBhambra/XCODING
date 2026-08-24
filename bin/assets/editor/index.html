@@ -84,11 +84,11 @@
           <div id="level-train-dropdown" class="level-train-dropdown hidden">
             <div class="train-dropdown-header">
               <span class="train-dropdown-title">LEVEL TRAIN SELECTOR</span>
-              <button id="btn-train-view-grid" class="train-grid-btn" title="View 100+ Catalog Grid">CATALOG ⊞</button>
+              <button id="btn-train-view-grid" class="train-grid-btn" title="View 50 Catalog Grid">CATALOG ⊞</button>
             </div>
             <div class="level-train-container" id="level-train-container">
               <div class="level-train-track" id="level-train-track">
-                <!-- Dynamically rendered 100+ level nodes on the track -->
+                <!-- Dynamically rendered 50 level nodes on the track -->
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@
                   </div>
                   <div class="stat-mini-card">
                     <div class="stat-mini-label">CLEARED</div>
-                    <div class="stat-mini-val emerald" id="dropdown-cleared">0 / 10</div>
+                    <div class="stat-mini-val emerald" id="dropdown-cleared">0 / 50</div>
                   </div>
                   <div class="stat-mini-card">
                     <div class="stat-mini-label">STATUS</div>
@@ -185,7 +185,7 @@
       <div id="app-view-container">
 
         <!-- ==================================================================
-             PAGE 1: GOOGLE AI INFINITE LEVEL EXPLORER (100+ LEVELS)
+             PAGE 1: GOOGLE AI LEVEL EXPLORER (50 LEVELS)
              ================================================================== -->
         <section id="view-levels" class="app-page hidden">
           <div class="levels-scroll-container">
@@ -195,7 +195,7 @@
               <div class="levels-google-header">
                 <div class="header-left-group">
                   <h1 class="levels-headline">LEVELS</h1>
-                  <div class="levels-subhead" id="levels-summary-text">100+ CHALLENGES • 0 CLEARED</div>
+                  <div class="levels-subhead" id="levels-summary-text">50 CHALLENGES • 0 CLEARED</div>
                 </div>
 
                 <!-- Segmented Filter Control -->
@@ -214,25 +214,23 @@
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                   </svg>
-                  <input type="text" id="level-search-input" placeholder="Search 100+ challenges..." spellcheck="false" />
+                  <input type="text" id="level-search-input" placeholder="Search 50 challenges..." spellcheck="false" />
                 </div>
 
                 <div class="topic-chips-container" id="topic-chips-bar">
                   <button class="topic-chip active" data-topic="all">All Topics</button>
                   <button class="topic-chip" data-topic="Basics">Basics</button>
-                  <button class="topic-chip" data-topic="Math">Math</button>
-                  <button class="topic-chip" data-topic="Loops">Loops</button>
-                  <button class="topic-chip" data-topic="Arrays">Arrays</button>
-                  <button class="topic-chip" data-topic="Strings">Strings</button>
-                  <button class="topic-chip" data-topic="Algorithms">Algorithms</button>
-                  <button class="topic-chip" data-topic="Bitwise">Bitwise</button>
-                  <button class="topic-chip" data-topic="DP">DP</button>
+                  <button class="topic-chip" data-topic="Variables">Variables</button>
+                  <button class="topic-chip" data-topic="Input">Input</button>
+                  <button class="topic-chip" data-topic="Arithmetic">Arithmetic</button>
+                  <button class="topic-chip" data-topic="Expressions">Expressions</button>
+                  <button class="topic-chip" data-topic="Floating Point">Floating Point</button>
                 </div>
               </div>
 
               <!-- Continuous Infinite Responsive Grid -->
               <div id="levels-infinite-grid" class="levels-infinite-grid">
-                <!-- Dynamically populated 100+ Level Cards -->
+                <!-- Dynamically populated 50 Level Cards -->
               </div>
 
             </div>
